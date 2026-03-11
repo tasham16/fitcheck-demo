@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitCheck — Proportion-Based Fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ─── BRAND TOKENS (v3) ─────────────────────────────────────────────────── */
+:root {
+  --pink:         #FF5CA5;
+  --pink-tint:    #FFDEED;
+  --pink-shade:   #D0005E;
+  --blue:         #002FA7;
+  --blue-tint:    #DDE7FF;
+  --blue-shade:   #001D65;
+  --red:          #E0002D;
+  --red-tint:     #FFC6D1;
+  --red-shade:    #700016;
+  --yellow:       #FFC31F;
+  --yellow-tint:  #FFF4CF;
+  --yellow-shade: #C89300;
+  --green:        #0EAD69;
+  --green-tint:   #D8EDDA;
+  --green-shade:  #08693F;
+  --violet:       #45062E;
+  --violet-tint:  #E8C4D8;
+  --ink:          #1A0A12;
+  --paper:        #FFFAF7;
+
+  --border: 2px solid var(--ink);
+  --border-thin: 1px solid rgba(26,10,18,0.12);
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-serif:   'Instrument Serif', Georgia, serif;
+  --font-sans:    'Instrument Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+}
+
+/* ─── RESET ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { cursor: pointer; font-family: inherit; }
+input { font-family: inherit; }
+
+/* ─── GLOBAL NAV ─────────────────────────────────────────────────────────── */
+.app-nav {
+  background: var(--ink);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+  gap: 0;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  border-bottom: var(--border);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--paper);
+  margin-right: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-logo-dot {
+  width: 8px; height: 8px;
+  background: var(--pink);
+  border-radius: 50%;
+}
+.nav-links {
+  display: flex;
+  gap: 0;
+  flex: 1;
+}
+.nav-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,250,247,0.38);
+  background: none;
+  border: none;
+  padding: 0 20px;
+  height: 56px;
+  transition: color 150ms ease;
+  border-right: 1px solid rgba(255,255,255,0.07);
+  position: relative;
+}
+.nav-btn:first-child { border-left: 1px solid rgba(255,255,255,0.07); }
+.nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--yellow);
+  transform: scaleX(0);
+  transition: transform 150ms ease;
+}
+.nav-btn:hover { color: var(--pink); }
+.nav-btn.active { color: var(--yellow); }
+.nav-btn.active::after { transform: scaleX(1); }
+
+.nav-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,250,247,0.25);
+  margin-left: auto;
+  padding-right: 0;
+}
+
+/* ─── SCREENS ────────────────────────────────────────────────────────────── */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding-top: 56px;
+}
+.screen.active { display: block; }
+
+/* ─── SHARED LAYOUT UTILS ───────────────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.38;
+  display: block;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 0.9;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.section-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink);
+  opacity: 0.6;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 1 — MEASUREMENT PROFILE
+═══════════════════════════════════════════════════════════════════════════ */
+#screen-profile.active {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 56px);
+}
+.profile-left {
+  padding: 64px 56px;
+  border-right: var(--border);
+  overflow-y: auto;
+}
+.profile-right {
+  padding: 64px 56px;
+  background: var(--paper);
+  overflow-y: auto;
+  position: sticky;
+  top: 56px;
+  max-height: calc(100vh - 56px);
+}
+
+/* Form groups */
+.form-section {
+  margin-bottom: 40px;
+  border: var(--border);
+  overflow: hidden;
+}
+.form-section-header {
+  background: var(--ink);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-section-header span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.form-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.field-wrap {
+  padding: 16px 20px;
+  border-right: var(--border-thin);
+  border-bottom: var(--border-thin);
+}
+.field-wrap:nth-child(2n) { border-right: none; }
+.field-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.4;
+  display: block;
+  margin-bottom: 6px;
+}
+.field-input {
+  width: 100%;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-bottom: 2px solid rgba(26,10,18,0.2);
+  padding: 4px 0 6px;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+.field-input:focus { border-bottom-color: var(--blue); }
+.field-input::placeholder { color: rgba(26,10,18,0.2); }
+.field-unit {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--ink);
+  opacity: 0.3;
+  margin-left: 4px;
+}
+
+/* Demo profile switcher */
+.profile-switcher {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32px;
+  border: var(--border);
+}
+.profile-chip {
+  flex: 1;
+  padding: 10px 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: var(--paper);
+  color: var(--ink);
+  border: none;
+  border-right: var(--border);
+  transition: background 150ms ease, color 150ms ease;
+  opacity: 0.5;
+}
+.profile-chip:last-child { border-right: none; }
+.profile-chip.active {
+  background: var(--ink);
+  color: var(--yellow);
+  opacity: 1;
+}
+.profile-chip:hover:not(.active) {
+  background: var(--pink-tint);
+  color: var(--pink);
+  opacity: 1;
+}
+
+.profile-cta {
+  width: 100%;
+  margin-top: 8px;
+  padding: 16px 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--border);
+  transition: background 160ms ease, color 160ms ease;
+}
+.profile-cta:hover { background: var(--blue); border-color: var(--blue); }
+
+/* Proportion vector panel */
+.vector-panel-header {
+  padding-bottom: 20px;
+  border-bottom: var(--border);
+  margin-bottom: 28px;
+}
+.ratio-rows { display: flex; flex-direction: column; gap: 0; }
+.ratio-row {
+  padding: 16px 0;
+  border-bottom: var(--border-thin);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.ratio-row.highlight { background: var(--yellow-tint); padding: 16px 12px; margin: 0 -12px; }
+.ratio-row:last-child { border-bottom: none; }
+.ratio-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.ratio-sublabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.35;
+}
+.ratio-bar-wrap { display: flex; align-items: center; gap: 10px; }
+.ratio-bar-track {
+  width: 100px;
+  height: 5px;
+  background: rgba(26,10,18,0.1);
+  overflow: hidden;
+}
+.ratio-bar-fill {
+  height: 5px;
+  background: var(--blue);
+  width: 0%;
+  transition: width 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ratio-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  min-width: 36px;
+  text-align: right;
+}
+.ratio-star {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--yellow-shade);
+  letter-spacing: 1px;
+}
+.ip-callout {
+  margin-top: 28px;
+  border-left: 3px solid var(--yellow);
+  padding: 12px 16px;
+  background: var(--yellow-tint);
+}
+.ip-callout-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--yellow-shade);
+  display: block;
+  margin-bottom: 6px;
+}
+.ip-callout p {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.7;
+  opacity: 0.75;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 2 — RETAILER PAGE + OVERLAY
+═══════════════════════════════════════════════════════════════════════════ */
+#screen-retailer { background: var(--paper); }
+
+/* Presenter controls */
+.presenter-bar {
+  background: var(--ink);
+  padding: 10px 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: var(--border);
+}
+.presenter-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,250,247,0.3);
+  margin-right: 8px;
+}
+.garment-chip {
+  padding: 7px 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid rgba(255,250,247,0.15);
+  transition: all 150ms ease;
+  position: relative;
+}
+.garment-chip.active { background: var(--paper); border-color: var(--paper); }
+.garment-chip:hover:not(.active) { border-color: var(--pink); color: var(--pink); background: rgba(255,92,165,0.1); }
+.chip-score {
+  font-size: 8px;
+  opacity: 0.6;
+  margin-left: 6px;
+}
+
+/* Profile 2 button */
+.profile2-btn {
+  margin-left: auto;
+  padding: 7px 14px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: none;
+  color: rgba(255,250,247,0.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  transition: all 150ms ease;
+}
+.profile2-btn.active { color: var(--pink); border-color: var(--pink); background: rgba(255,92,165,0.08); }
+.profile2-btn:hover { color: var(--pink); border-color: var(--pink); }
+
+/* Mock retailer page */
+.retailer-nav {
+  background: var(--paper);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  border-bottom: var(--border);
+  gap: 40px;
+}
+.retailer-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 5px;
+  color: var(--ink);
+}
+.retailer-navlinks {
+  display: flex;
+  gap: 28px;
+  margin-left: auto;
+}
+.retailer-navlink {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(26,10,18,0.4);
+}
+
+.retailer-product {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 40px;
+  gap: 64px;
+}
+
+.product-image {
+  aspect-ratio: 3/4;
+  background: var(--blue-tint);
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.product-image-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue-shade);
+  opacity: 0.4;
+}
+/* Decorative orbit in product image */
+.product-image-orbit {
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 20px solid var(--blue);
+  opacity: 0.12;
+}
+.product-image-orbit-2 {
+  position: absolute;
+  bottom: -90px;
+  right: -90px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 20px solid var(--pink);
+  opacity: 0.08;
+}
+
+.product-info { display: flex; flex-direction: column; gap: 0; }
+.product-brand-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.35;
+  margin-bottom: 8px;
+}
+.product-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 28px;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+.product-sku {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.25;
+  margin-bottom: 20px;
+}
+.product-price {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 16px 0;
+  border-top: var(--border-thin);
+  border-bottom: var(--border-thin);
+  margin-bottom: 24px;
+}
+.product-size-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.4;
+  display: block;
+  margin-bottom: 10px;
+}
+.size-select {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  border: var(--border);
+  border-radius: 0;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231A0A12' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  margin-bottom: 0;
+}
+
+/* FitCheck overlay panel */
+.fitcheck-overlay {
+  margin: 16px 0;
+  background: var(--blue-tint);
+  border: 2px solid var(--blue);
+  border-left: 4px solid var(--blue);
+  padding: 20px 24px;
+  transition: opacity 200ms ease;
+}
+.overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.overlay-brand {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--blue);
+}
+.overlay-brand-dot {
+  width: 5px; height: 5px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+.overlay-divider {
+  flex: 1;
+  height: 1px;
+  background: rgba(0,47,167,0.2);
+}
+.overlay-confidence {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue-shade);
+  opacity: 0.5;
+}
+
+.overlay-score-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+.overlay-score-num {
+  font-family: var(--font-display);
+  font-size: 72px;
+  line-height: 1;
+  transition: color 200ms ease;
+}
+.overlay-score-meta { display: flex; flex-direction: column; gap: 4px; }
+.overlay-score-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: color 200ms ease;
+}
+.overlay-score-sublabel {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink);
+  opacity: 0.55;
+  line-height: 1.5;
+  max-width: 220px;
+}
+
+.overlay-signals { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.overlay-signal {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.signal-icon {
+  font-size: 14px;
+  width: 18px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.overlay-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,47,167,0.15);
+}
+.overlay-cta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--pink);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 150ms ease;
+  cursor: pointer;
+}
+.overlay-cta:hover { color: var(--pink-shade); }
+
+.add-to-cart {
+  width: 100%;
+  padding: 16px 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--border);
+  transition: background 160ms ease;
+  margin-top: 0;
+}
+.add-to-cart:hover { background: var(--violet); border-color: var(--violet); }
+
+.product-desc {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: var(--border-thin);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink);
+  opacity: 0.55;
+  line-height: 1.8;
+}
+.product-desc strong {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 3 — SCORE BREAKDOWN
+═══════════════════════════════════════════════════════════════════════════ */
+#screen-breakdown {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 64px 40px;
+}
+.breakdown-back {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--pink);
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 40px;
+  cursor: pointer;
+  transition: color 150ms ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breakdown-back:hover { color: var(--pink-shade); }
+
+.breakdown-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: start;
+  margin-bottom: 48px;
+  padding-bottom: 40px;
+  border-bottom: var(--border);
+}
+.breakdown-score-block {
+  text-align: right;
+}
+.breakdown-score-num {
+  font-family: var(--font-display);
+  font-size: 96px;
+  line-height: 1;
+  display: block;
+}
+.breakdown-score-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Dimension table */
+.dim-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 4px;
+}
+.dim-table { border: var(--border); overflow: hidden; margin-bottom: 28px; }
+.dim-table-header {
+  background: var(--ink);
+  display: grid;
+  grid-template-columns: 1fr 140px 36px;
+  gap: 16px;
+  padding: 10px 20px;
+}
+.dim-table-header span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--yellow);
+  opacity: 0.8;
+}
+.dim-table-header span:nth-child(2) { text-align: right; }
+.dim-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 36px;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: var(--border-thin);
+  align-items: center;
+}
+.dim-row:last-child { border-bottom: none; }
+.dim-row.dim-row-alt { background: rgba(26,10,18,0.02); }
+.dim-row-label { font-family: var(--font-sans); font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+.dim-row-signal { font-family: var(--font-sans); font-size: 12px; color: var(--ink); opacity: 0.55; }
+.dim-bar-wrap { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.dim-bar-track { width: 120px; height: 5px; background: rgba(26,10,18,0.08); overflow: hidden; }
+.dim-bar-fill { height: 5px; width: 0%; transition: width 600ms cubic-bezier(0.4,0,0.2,1); }
+.dim-score-val {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ink);
+  opacity: 0.4;
+}
+.dim-icon { font-size: 16px; text-align: center; }
+
+/* Length-girth callout */
+.lg-callout {
+  border-left: 4px solid var(--blue);
+  background: var(--blue-tint);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+.lg-callout-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--blue-shade);
+  display: block;
+  margin-bottom: 8px;
+}
+.lg-callout p {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.75;
+  opacity: 0.75;
+}
+
+/* Confidence section */
+.confidence-section { border: var(--border); overflow: hidden; }
+.confidence-header {
+  background: rgba(26,10,18,0.04);
+  padding: 12px 20px;
+  border-bottom: var(--border-thin);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.confidence-header span {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.4;
+}
+.confidence-rows { display: flex; flex-direction: column; }
+.conf-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  padding: 12px 20px;
+  border-bottom: var(--border-thin);
+  align-items: center;
+  gap: 16px;
+}
+.conf-row:last-child { border-bottom: none; }
+.conf-key { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); opacity: 0.4; }
+.conf-val { font-family: var(--font-sans); font-size: 13px; font-weight: 500; color: var(--ink); }
+.conf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.conf-badge.high { color: var(--green-shade); border-color: var(--green); background: var(--green-tint); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN 4 — COMPARISON
+═══════════════════════════════════════════════════════════════════════════ */
+#screen-compare { padding: 64px 48px; }
+.compare-intro {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: var(--border);
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: var(--border);
+  overflow: hidden;
+}
+.compare-col {
+  border-right: var(--border);
+  transition: opacity 300ms ease;
+}
+.compare-col:last-child { border-right: none; }
+.compare-col.dimmed { opacity: 0.38; }
+
+.compare-col-header {
+  padding: 24px 24px 20px;
+  border-bottom: var(--border);
+  background: var(--paper);
+  position: relative;
+}
+.best-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--ink);
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.compare-garment-name {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.compare-garment-sub {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.3;
+}
+
+.compare-score-block {
+  padding: 28px 24px;
+  border-bottom: var(--border);
+  background: var(--paper);
+}
+.compare-score-num {
+  font-family: var(--font-display);
+  font-size: 64px;
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+.compare-score-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.compare-signals {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-bottom: var(--border);
+}
+.compare-signal {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.compare-recommendation {
+  padding: 20px 24px;
+  border-top: none;
+}
+.compare-recommendation p {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink);
+  opacity: 0.65;
+  line-height: 1.6;
+}
+
+/* ─── SCORE COLOR UTILITY ─────────────────────────────────────────────── */
+.score-strong { color: var(--green); }
+.score-good   { color: var(--yellow-shade); }
+.score-mixed  { color: var(--yellow-shade); }
+.score-poor   { color: var(--red); }
+.icon-pass  { color: var(--green); }
+.icon-warn  { color: var(--yellow-shade); }
+.icon-fail  { color: var(--red); }
+.icon-na    { color: rgba(26,10,18,0.25); }
+
+/* ─── TRANSITION ─────────────────────────────────────────────────────── */
+.fade-enter {
+  animation: fadeUp 200ms ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  #screen-profile.active { grid-template-columns: 1fr; }
+  .profile-right { position: static; max-height: none; border-top: var(--border); }
+  .retailer-product { grid-template-columns: 1fr; gap: 32px; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .compare-col { border-right: none; border-bottom: var(--border); }
+  .breakdown-hero { grid-template-columns: 1fr; }
+  .breakdown-score-block { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ GLOBAL NAV ══════════════════════════════════════════════════════════ -->
+<nav class="app-nav">
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    FITCHECK
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" data-screen="profile">01 — Profile</button>
+    <button class="nav-btn" data-screen="retailer">02 — In-Store</button>
+    <button class="nav-btn" data-screen="breakdown">03 — Breakdown</button>
+    <button class="nav-btn" data-screen="compare">04 — Compare</button>
+  </div>
+  <span class="nav-badge">Prototype · Demo Build</span>
+</nav>
+
+
+<!-- ══ SCREEN 1: PROFILE ═══════════════════════════════════════════════════ -->
+<div id="screen-profile" class="screen active">
+  <!-- LEFT: inputs -->
+  <div class="profile-left">
+    <span class="eyebrow">01 — Measurement Profile</span>
+    <div class="section-title">YOUR<br>PROPORTIONS</div>
+    <div class="section-sub">Not your size — your proportions.</div>
+
+    <div class="profile-switcher">
+      <button class="profile-chip active" data-profile="A">Demo Profile A<br><span style="opacity:.5;font-size:8px;">Tall · Curvy</span></button>
+      <button class="profile-chip" data-profile="B">Demo Profile B<br><span style="opacity:.5;font-size:8px;">Petite · Fuller</span></button>
+    </div>
+
+    <!-- Lower Body -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <span>Lower Body</span>
+        <span style="opacity:.3;">Critical for pants</span>
+      </div>
+      <div class="form-fields">
+        <div class="field-wrap">
+          <label class="field-label">Waist <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-waist" type="number" placeholder="72">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Hip <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-hip" type="number" placeholder="104">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">High Hip <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-highhip" type="number" placeholder="91">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Thigh <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-thigh" type="number" placeholder="62">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Inseam <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-inseam" type="number" placeholder="82">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Outseam <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-outseam" type="number" placeholder="108">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Front Rise <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-frontrise" type="number" placeholder="24">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Back Rise <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-backrise" type="number" placeholder="29">
+        </div>
+      </div>
+    </div>
+
+    <!-- Context -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <span>Context</span>
+        <span style="opacity:.3;">Used for ratio derivation</span>
+      </div>
+      <div class="form-fields">
+        <div class="field-wrap">
+          <label class="field-label">Height <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-height" type="number" placeholder="174">
+        </div>
+        <div class="field-wrap">
+          <label class="field-label">Torso Length <span class="field-unit">cm</span></label>
+          <input class="field-input" id="f-torso" type="number" placeholder="58">
+        </div>
+      </div>
+    </div>
+
+    <button class="profile-cta" onclick="goToScreen('retailer')">See how your clothes fit →</button>
+  </div>
+
+  <!-- RIGHT: proportion vector panel -->
+  <div class="profile-right">
+    <div class="vector-panel-header">
+      <span class="eyebrow" style="margin-bottom:8px;">Your Proportion Profile</span>
+      <p style="font-family:var(--font-sans);font-size:13px;color:var(--ink);opacity:.55;line-height:1.7;">
+        These ratios — not your size label — are what we match against garment construction. Two people who wear a size 28 may have very different ratios.
+      </p>
+    </div>
+
+    <div class="ratio-rows" id="ratio-rows">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="ip-callout" style="margin-top:28px;">
+      <span class="ip-callout-label">★ Core IP — Two Dimensions Others Ignore</span>
+      <p>Front-to-back rise ratio and inseam-to-waist ratio are the two proportion dimensions most existing fit tools collapse or ignore. They're marked with ★ above and are key differentiators in the FitCheck scoring engine.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 2: RETAILER PAGE ════════════════════════════════════════════ -->
+<div id="screen-retailer" class="screen">
+  <!-- Presenter controls -->
+  <div class="presenter-bar">
+    <span class="presenter-label">Garment</span>
+    <button class="garment-chip active" data-garment="nadia">The Nadia <span class="chip-score">82</span></button>
+    <button class="garment-chip" data-garment="celeste">The Celeste <span class="chip-score">54</span></button>
+    <button class="garment-chip" data-garment="kama">The Kama <span class="chip-score">91</span></button>
+    <button class="profile2-btn" id="profile2-toggle">Profile B: Petite / Fuller</button>
+  </div>
+
+  <!-- Mock retailer nav -->
+  <div class="retailer-nav">
+    <div class="retailer-logo">FERNE</div>
+    <div class="retailer-navlinks">
+      <span class="retailer-navlink">New In</span>
+      <span class="retailer-navlink">Denim</span>
+      <span class="retailer-navlink">Trousers</span>
+      <span class="retailer-navlink">About</span>
+    </div>
+  </div>
+
+  <!-- Product page -->
+  <div class="retailer-product">
+    <div class="product-image">
+      <div class="product-image-orbit"></div>
+      <div class="product-image-orbit-2"></div>
+      <span class="product-image-label" id="product-img-label">Straight Leg · Indigo Wash</span>
+    </div>
+    <div class="product-info">
+      <span class="product-brand-label">Ferne — Ready to Wear</span>
+      <div class="product-name" id="product-name">The Nadia Straight-Leg Jean</div>
+      <div class="product-sku" id="product-sku">SKU FERNE-NADIA-001 · Straight Leg · Indigo</div>
+      <div class="product-price" id="product-price">$198</div>
+
+      <label class="product-size-label">Select Size (Waist)</label>
+      <select class="size-select">
+        <option>24</option><option>25</option><option>26</option>
+        <option selected>27</option><option>28</option><option>29</option>
+        <option>30</option><option>32</option>
+      </select>
+
+      <!-- FitCheck overlay (injected) -->
+      <div class="fitcheck-overlay" id="fitcheck-overlay">
+        <div class="overlay-header">
+          <span class="overlay-brand">FITCHECK</span>
+          <div class="overlay-brand-dot"></div>
+          <span style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--blue);opacity:.5;">FIT SCORE</span>
+          <div class="overlay-divider"></div>
+          <span class="overlay-confidence" id="overlay-confidence">High Confidence · Brand API</span>
+        </div>
+
+        <div class="overlay-score-row">
+          <div class="overlay-score-num" id="overlay-score-num" style="color:var(--green)">82</div>
+          <div class="overlay-score-meta">
+            <div class="overlay-score-label" id="overlay-score-label" style="color:var(--green)">Good Match</div>
+            <div class="overlay-score-sublabel" id="overlay-score-sublabel">Works for your proportions in most dimensions.</div>
+          </div>
+        </div>
+
+        <div class="overlay-signals" id="overlay-signals">
+          <!-- populated by JS -->
+        </div>
+
+        <div class="overlay-footer">
+          <button class="overlay-cta" onclick="goToScreen('breakdown')">See full breakdown →</button>
+          <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--blue-shade);opacity:.4;" id="overlay-updated">Last verified 3 days ago</span>
+        </div>
+      </div>
+
+      <button class="add-to-cart">Add to Cart</button>
+
+      <div class="product-desc">
+        <strong>About this style</strong>
+        A clean, straight-leg silhouette in premium Japanese selvedge denim. Mid-rise with a relaxed seat and thigh. Available in short, regular, and tall inseam lengths.
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 3: BREAKDOWN ════════════════════════════════════════════════ -->
+<div id="screen-breakdown" class="screen">
+  <button class="breakdown-back" onclick="goToScreen('retailer')">← Back to garment</button>
+
+  <div style="margin-bottom:40px;">
+    <span class="eyebrow" id="breakdown-eyebrow">Fit Analysis — The Nadia Straight-Leg Jean</span>
+    <div style="font-family:var(--font-serif);font-style:italic;font-size:30px;color:var(--ink);line-height:1.2;margin-bottom:4px;" id="breakdown-garment-name">The Nadia Straight-Leg Jean</div>
+    <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink);opacity:.3;" id="breakdown-sku">FERNE · SKU FERNE-NADIA-001 · Size 27</div>
+  </div>
+
+  <div class="breakdown-hero">
+    <div>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--ink);opacity:.55;line-height:1.75;max-width:420px;" id="breakdown-summary-text">
+        This garment's construction aligns well with your proportions in most dimensions. The inseam may run slightly short for your frame — the tall option is available and recommended.
+      </p>
+    </div>
+    <div class="breakdown-score-block">
+      <span class="breakdown-score-num" id="breakdown-score-num" style="color:var(--green)">82</span>
+      <span class="breakdown-score-label" id="breakdown-score-label" style="color:var(--green)">Good Match</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom:8px;">
+    <span class="eyebrow">Dimension Breakdown</span>
+    <p style="font-family:var(--font-sans);font-size:13px;color:var(--ink);opacity:.45;margin-bottom:20px;">Each dimension scored independently — never averaged. Inseam and waist are separate signals.</p>
+  </div>
+
+  <div class="dim-table">
+    <div class="dim-table-header">
+      <span>Dimension</span>
+      <span>Score</span>
+      <span></span>
+    </div>
+    <div id="dim-rows">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <div class="lg-callout">
+    <span class="lg-callout-label">About Inseam + Waist — Length–Girth Independence</span>
+    <p>Inseam score and waist score are never averaged together. For tall or slim bodies, length and girth don't scale together — averaging them hides the fit problem. You'll always see them as separate signals here.</p>
+  </div>
+
+  <div class="confidence-section">
+    <div class="confidence-header">
+      <span>About This Score</span>
+      <span id="conf-score-display">Confidence: 0.88</span>
+    </div>
+    <div class="confidence-rows" id="confidence-rows">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SCREEN 4: COMPARISON ═══════════════════════════════════════════════ -->
+<div id="screen-compare" class="screen">
+  <div class="compare-intro">
+    <span class="eyebrow">Your Fit Assessment — 3 Garments</span>
+    <div class="section-title">FIND YOUR FIT</div>
+    <div class="section-sub">Scored against your proportion profile. Dimensions evaluated independently.</div>
+  </div>
+
+  <div class="compare-grid" id="compare-grid">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+
+<!-- ══ JAVASCRIPT ══════════════════════════════════════════════════════════ -->
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+const profiles = {
+  A: {
+    label: "Demo Profile A — Tall, Curvy",
+    waist: 72, hip: 104, highHip: 91, thigh: 62,
+    inseam: 82, outseam: 108, frontRise: 24, backRise: 29,
+    height: 174, torso: 58
+  },
+  B: {
+    label: "Demo Profile B — Petite, Fuller",
+    waist: 76, hip: 106, highHip: 94, thigh: 67,
+    inseam: 69, outseam: 94, frontRise: 22, backRise: 28,
+    height: 158, torso: 52
+  }
+};
+
+const garments = {
+  nadia: {
+    name: "The Nadia Straight-Leg Jean",
+    sub: "SKU FERNE-NADIA-001 · Straight Leg · Indigo",
+    imgLabel: "Straight Leg · Indigo Wash",
+    price: "$198",
+    category: "pants",
+    // flat measurements (cm), then stretch
+    waistFlat: 34, waistStretch: 41,
+    hipFlat: 49, hipStretch: 56,
+    thighFlat: 28.5, thighStretch: 33,
+    frontRise: 25, backRise: 30,
+    inseam: 78, inseamTall: 84,
+    offersTall: true,
+    fabric: "98% Cotton, 2% Elastane",
+    confidence: 0.88,
+    source: "Brand API",
+    verified: "3 days ago",
+  },
+  celeste: {
+    name: "The Celeste Wide-Leg Trouser",
+    sub: "SKU FERNE-CELESTE-003 · Wide Leg · Black",
+    imgLabel: "Wide Leg · Black",
+    price: "$224",
+    category: "pants",
+    waistFlat: 33, waistStretch: 35,
+    hipFlat: 46, hipStretch: 49,
+    thighFlat: 33, thighStretch: 36,
+    frontRise: 29, backRise: 32,
+    inseam: 82,
+    offersTall: false,
+    fabric: "100% Wool Crepe",
+    confidence: 0.72,
+    source: "Size Guide (scraped)",
+    verified: "11 days ago",
+  },
+  kama: {
+    name: "The Kama Relaxed Straight",
+    sub: "SKU FERNE-KAMA-007 · Relaxed Straight · Ecru",
+    imgLabel: "Relaxed Straight · Ecru",
+    price: "$186",
+    category: "pants",
+    waistFlat: 34.5, waistStretch: 43,
+    hipFlat: 51, hipStretch: 59,
+    thighFlat: 30, thighStretch: 36,
+    frontRise: 24, backRise: 29,
+    inseam: 80, inseamTall: 86,
+    offersTall: true,
+    fabric: "92% Cotton, 8% Elastane",
+    confidence: 0.91,
+    source: "Brand API",
+    verified: "1 day ago",
+  }
+};
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let currentScreen   = 'profile';
+let currentGarment  = 'nadia';
+let currentProfile  = 'A';
+let profile2Active  = false;
+
+// ── SCORE ENGINE ────────────────────────────────────────────────────────────
+function deriveRatios(p) {
+  return {
+    waistToHip:        round2(p.waist / p.hip),
+    highHipToHip:      round2(p.highHip / p.hip),
+    thighToHip:        round2(p.thigh / p.hip),
+    frontBackRise:     round2(p.frontRise / p.backRise),
+    inseamToHeight:    round2(p.inseam / p.height),
+    inseamToWaist:     round2(p.inseam / p.waist),
+    torsoToLeg:        round2(p.torso / p.inseam),
+  };
+}
+
+function round2(n) { return Math.round(n * 100) / 100; }
+
+function computeFitWindow(flat, stretch) {
+  // flat measurement → circumference range
+  const stretchPct = stretch ? (stretch - flat) / flat : 0;
+  const ease = 1.5; // standard ease allowance cm
+  const min = (flat * 2) - ease;
+  const max = (flat * (1 + stretchPct)) * 2;
+  return { min, max };
+}
+
+function scoreDimension(actual, min, max, isRise = false) {
+  if (actual >= min && actual <= max) return 1.0;
+  const boundary = actual < min ? min : max;
+  const delta = Math.abs(actual - boundary);
+  const decay = isRise ? 2.5 : 2.0;
+  return Math.max(0, 1 - ((delta / boundary) * decay));
+}
+
+function scoreGarment(profile, garment) {
+  const p = profile;
+  const g = garment;
+  const weights = { waist: 0.25, hip: 0.20, rise: 0.25, thigh: 0.15, inseam: 0.15 };
+
+  // waist
+  const waistWin = computeFitWindow(g.waistFlat, g.waistStretch);
+  const waistScore = scoreDimension(p.waist, waistWin.min, waistWin.max);
+
+  // hip
+  const hipWin = computeFitWindow(g.hipFlat, g.hipStretch);
+  const hipScore = scoreDimension(p.hip, hipWin.min, hipWin.max);
+
+  // thigh
+  const thighWin = computeFitWindow(g.thighFlat, g.thighStretch);
+  const thighScore = scoreDimension(p.thigh, thighWin.min, thighWin.max);
+
+  // rise (front+back combined, ratio aware)
+  const riseScore = scoreDimension(p.frontRise, g.frontRise - 2, g.frontRise + 3, true) * 0.5
+                  + scoreDimension(p.backRise,  g.backRise  - 2, g.backRise  + 4, true) * 0.5;
+
+  // inseam (independent — length vs girth never averaged)
+  const effectiveInseam = g.offersTall ? (g.inseamTall || g.inseam) : g.inseam;
+  const inseamScore = scoreDimension(p.inseam, effectiveInseam - 4, effectiveInseam + 2);
+
+  const raw = waistScore * weights.waist
+            + hipScore   * weights.hip
+            + riseScore  * weights.rise
+            + thighScore * weights.thigh
+            + inseamScore * weights.inseam;
+
+  const confidence = g.confidence;
+  const adjusted = raw * (confidence * 0.7 + 0.3);
+  const final = Math.round(adjusted * 100);
+
+  return {
+    total: final,
+    dims: [
+      { key: 'waist',  label: 'Waist',       score: waistScore,  signal: signalText('waist', p.waist, waistWin) },
+      { key: 'hip',    label: 'Hip / Seat',   score: hipScore,    signal: signalText('hip',   p.hip,   hipWin) },
+      { key: 'thigh',  label: 'Thigh',        score: thighScore,  signal: signalText('thigh', p.thigh, thighWin) },
+      { key: 'rise',   label: 'Front / Back Rise', score: riseScore, signal: riseSignal(p, g) },
+      { key: 'inseam', label: 'Inseam',       score: inseamScore, signal: inseamSignal(p, g), independent: true },
+    ]
+  };
+}
+
+function signalText(dim, actual, win) {
+  if (actual >= win.min && actual <= win.max) return 'Fits your proportions well';
+  if (actual < win.min) return 'Garment runs large for this dimension';
+  return 'Garment runs small — may feel tight';
+}
+function riseSignal(p, g) {
+  const frontOk = Math.abs(p.frontRise - g.frontRise) <= 2;
+  const backOk  = Math.abs(p.backRise  - g.backRise)  <= 3;
+  if (frontOk && backOk) return 'Rise proportion matches your front-back ratio';
+  if (!backOk) return 'Back rise may sit too low or too high for your seat';
+  return 'Front rise slightly off your proportion ratio';
+}
+function inseamSignal(p, g) {
+  const eff = g.offersTall ? (g.inseamTall || g.inseam) : g.inseam;
+  const diff = p.inseam - eff;
+  if (Math.abs(diff) <= 3) return 'Inseam aligns with your leg length';
+  if (diff > 3) return `May run ${Math.round(diff)}cm short — tall option ${g.offersTall ? 'available' : 'not available'}`;
+  return `May run ${Math.round(-diff)}cm long for your frame`;
+}
+
+function scoreColor(score) {
+  if (score >= 80) return 'var(--green)';
+  if (score >= 60) return 'var(--yellow-shade)';
+  if (score >= 40) return 'var(--yellow-shade)';
+  return 'var(--red)';
+}
+function scoreLabel(score) {
+  if (score >= 80) return 'Good Match';
+  if (score >= 60) return 'Fair Match';
+  if (score >= 40) return 'Mixed';
+  return 'Poor Match';
+}
+function dimScoreColor(s) {
+  if (s >= 0.75) return 'var(--green)';
+  if (s >= 0.50) return 'var(--yellow-shade)';
+  if (s >= 0.30) return 'var(--yellow-shade)';
+  return 'var(--red)';
+}
+function dimIcon(s) {
+  if (s >= 0.75) return '<span class="icon-pass">✓</span>';
+  if (s >= 0.40) return '<span class="icon-warn">↓</span>';
+  return '<span class="icon-fail">↕</span>';
+}
+
+// ── RATIO LABELS ────────────────────────────────────────────────────────────
+const ratioMeta = [
+  { key:'waistToHip',    label:'Waist to Hip',           sub:'Core proportion indicator', ip: false },
+  { key:'highHipToHip',  label:'High Hip to Hip',        sub:'Seat curve entry', ip: false },
+  { key:'thighToHip',    label:'Thigh to Hip',           sub:'Lower body fullness', ip: false },
+  { key:'frontBackRise', label:'Front to Back Rise',     sub:'★ Seat depth ratio', ip: true },
+  { key:'inseamToHeight',label:'Inseam to Height',       sub:'Leg-to-torso proportion', ip: false },
+  { key:'inseamToWaist', label:'Inseam to Waist',        sub:'★ Length–girth independence', ip: true },
+  { key:'torsoToLeg',    label:'Torso to Leg',           sub:'Vertical proportion split', ip: false },
+];
+
+// ── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
+
+function renderRatioPanel(profileKey) {
+  const p = profiles[profileKey];
+  const ratios = deriveRatios(p);
+  const container = document.getElementById('ratio-rows');
+  container.innerHTML = '';
+  ratioMeta.forEach((r, i) => {
+    const val = ratios[r.key];
+    const pct = Math.min(100, Math.round(val * 100));
+    const row = document.createElement('div');
+    row.className = 'ratio-row' + (r.ip ? ' highlight' : '');
+    row.innerHTML = `
+      <div>
+        <div class="ratio-label">${r.label}${r.ip ? ' <span class="ratio-star">★ IP</span>' : ''}</div>
+        <div class="ratio-sublabel">${r.sub}</div>
+      </div>
+      <div class="ratio-bar-wrap">
+        <div class="ratio-bar-track">
+          <div class="ratio-bar-fill" id="rbar-${r.key}" style="width:0%"></div>
+        </div>
+        <div class="ratio-value">${val}</div>
+      </div>
+    `;
+    container.appendChild(row);
+    setTimeout(() => {
+      const fill = document.getElementById('rbar-' + r.key);
+      if (fill) fill.style.width = pct + '%';
+    }, 80 + i * 60);
+  });
+}
+
+function renderOverlay(garmentKey, profileKey) {
+  const g = garments[garmentKey];
+  const p = profiles[profileKey];
+  const result = scoreGarment(p, g);
+  const score = result.total;
+
+  const numEl   = document.getElementById('overlay-score-num');
+  const labelEl = document.getElementById('overlay-score-label');
+  const subEl   = document.getElementById('overlay-score-sublabel');
+  const sigsEl  = document.getElementById('overlay-signals');
+  const confEl  = document.getElementById('overlay-confidence');
+  const updEl   = document.getElementById('overlay-updated');
+
+  // Animate score number
+  const ol = document.getElementById('fitcheck-overlay');
+  ol.style.opacity = '0.4';
+  setTimeout(() => {
+    numEl.textContent = score;
+    numEl.style.color = scoreColor(score);
+    labelEl.textContent = scoreLabel(score);
+    labelEl.style.color = scoreColor(score);
+
+    // summary sublabel
+    if (score >= 80) subEl.textContent = 'Works for your proportions in most dimensions.';
+    else if (score >= 60) subEl.textContent = 'Some dimensions align well; a few need attention.';
+    else if (score >= 40) subEl.textContent = 'Proportions partially compatible — read the breakdown.';
+    else subEl.textContent = 'Significant proportion mismatch — likely an uncomfortable fit.';
+
+    confEl.textContent = Math.round(g.confidence * 100) + '% Confidence · ' + g.source;
+    updEl.textContent = 'Last verified ' + g.verified;
+
+    // signals: top 3 dims
+    sigsEl.innerHTML = '';
+    result.dims.slice(0, 3).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'overlay-signal';
+      div.innerHTML = `<span class="signal-icon">${d.score >= 0.75 ? '✓' : d.score >= 0.40 ? '↓' : '↕'}</span>
+        <span style="color:${dimScoreColor(d.score)};margin-right:4px;">${d.label}:</span>
+        <span style="opacity:.7;">${d.signal}</span>`;
+      sigsEl.appendChild(div);
+    });
+
+    // product details
+    document.getElementById('product-name').textContent = g.name;
+    document.getElementById('product-sku').textContent = g.sub;
+    document.getElementById('product-price').textContent = g.price;
+    document.getElementById('product-img-label').textContent = g.imgLabel;
+
+    ol.style.opacity = '1';
+    ol.style.transition = 'opacity 200ms ease';
+  }, 160);
+}
+
+function renderBreakdown(garmentKey, profileKey) {
+  const g = garments[garmentKey];
+  const p = profiles[profileKey];
+  const result = scoreGarment(p, g);
+  const score = result.total;
+
+  document.getElementById('breakdown-eyebrow').textContent = 'Fit Analysis — ' + g.name;
+  document.getElementById('breakdown-garment-name').textContent = g.name;
+  document.getElementById('breakdown-sku').textContent = 'FERNE · ' + g.sub.split('·')[0].trim() + ' · Size 27';
+
+  const numEl   = document.getElementById('breakdown-score-num');
+  const labelEl = document.getElementById('breakdown-score-label');
+  numEl.textContent = score;
+  numEl.style.color = scoreColor(score);
+  labelEl.textContent = scoreLabel(score);
+  labelEl.style.color = scoreColor(score);
+
+  const summaries = {
+    nadia: "This garment's construction aligns well with your proportions in most dimensions. The inseam may run slightly short for your frame — the tall option is available and recommended.",
+    celeste: "The Celeste's low-stretch construction creates tension at the hip and seat for your proportions. The rise placement doesn't map well to your front-back ratio.",
+    kama: "Excellent proportion match. The Kama's construction aligns with your waist-to-hip ratio and rise proportions. The tall inseam option is recommended."
+  };
+  document.getElementById('breakdown-summary-text').textContent = summaries[garmentKey];
+
+  // dimension rows
+  const container = document.getElementById('dim-rows');
+  container.innerHTML = '';
+  result.dims.forEach((d, i) => {
+    const pct = Math.round(d.score * 100);
+    const row = document.createElement('div');
+    row.className = 'dim-row' + (i % 2 === 1 ? ' dim-row-alt' : '');
+    row.innerHTML = `
+      <div>
+        <div class="dim-row-label">${d.label}${d.independent ? ' <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--blue);opacity:.6;text-transform:uppercase;"> — Independent</span>' : ''}</div>
+        <div class="dim-row-signal">${d.signal}</div>
+      </div>
+      <div class="dim-bar-wrap">
+        <div class="dim-bar-track">
+          <div class="dim-bar-fill" id="dbar-${d.key}" style="background:${dimScoreColor(d.score)};width:0%"></div>
+        </div>
+        <div class="dim-score-val">${pct} / 100</div>
+      </div>
+      <div class="dim-icon">${dimIcon(d.score)}</div>
+    `;
+    container.appendChild(row);
+    setTimeout(() => {
+      const fill = document.getElementById('dbar-' + d.key);
+      if (fill) fill.style.width = pct + '%';
+    }, 100 + i * 80);
+  });
+
+  // confidence
+  document.getElementById('conf-score-display').textContent = 'Confidence: ' + g.confidence.toFixed(2);
+  const confRows = document.getElementById('confidence-rows');
+  confRows.innerHTML = `
+    <div class="conf-row"><span class="conf-key">Source</span><span class="conf-val">${g.source}</span></div>
+    <div class="conf-row"><span class="conf-key">Last Verified</span><span class="conf-val">${g.verified}</span></div>
+    <div class="conf-row"><span class="conf-key">Fields Scored</span><span class="conf-val">5 of 5 dimensions</span></div>
+    <div class="conf-row"><span class="conf-key">Confidence</span><span class="conf-val"><span class="conf-badge high">● ${Math.round(g.confidence * 100)}% High</span></span></div>
+    <div class="conf-row"><span class="conf-key">Fabric</span><span class="conf-val">${g.fabric}</span></div>
+  `;
+}
+
+function renderCompare(profileKey) {
+  const p = profiles[profileKey];
+  const keys = ['nadia', 'celeste', 'kama'];
+  const results = {};
+  keys.forEach(k => { results[k] = scoreGarment(p, garments[k]); });
+
+  const bestKey = keys.reduce((a, b) => results[a].total > results[b].total ? a : b);
+  const grid = document.getElementById('compare-grid');
+  grid.innerHTML = '';
+
+  keys.forEach(k => {
+    const g = garments[k];
+    const r = results[k];
+    const score = r.total;
+    const isBest = k === bestKey;
+    const isWorst = !isBest && score < 60;
+
+    const col = document.createElement('div');
+    col.className = 'compare-col' + (isWorst ? ' dimmed' : '');
+
+    const signals = r.dims.slice(0, 3).map(d =>
+      `<div class="compare-signal">
+        <span class="signal-icon" style="color:${dimScoreColor(d.score)}">${d.score >= 0.75 ? '✓' : d.score >= 0.40 ? '↓' : '↕'}</span>
+        <span style="font-size:12px;">${d.label}: <span style="opacity:.55">${d.signal}</span></span>
+      </div>`
+    ).join('');
+
+    const recs = {
+      nadia: 'Works well — request the tall inseam option.',
+      celeste: 'Significant hip and rise mismatch — skip this one.',
+      kama: 'Best match for your proportions. Try in-store.'
+    };
+
+    col.innerHTML = `
+      <div class="compare-col-header">
+        ${isBest ? '<div class="best-badge">★ Best Match</div>' : '<div style="height:24px;margin-bottom:10px;"></div>'}
+        <div class="compare-garment-name">${g.name}</div>
+        <div class="compare-garment-sub">FERNE · ${g.sub.split('·')[1]?.trim() || 'Denim'}</div>
+      </div>
+      <div class="compare-score-block">
+        <span class="compare-score-num" style="color:${scoreColor(score)}">${score}</span>
+        <span class="compare-score-label" style="color:${scoreColor(score)}">${scoreLabel(score)}</span>
+      </div>
+      <div class="compare-signals">${signals}</div>
+      <div class="compare-recommendation">
+        <p>${recs[k]}</p>
+      </div>
+    `;
+    grid.appendChild(col);
+  });
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function goToScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  const screen = document.getElementById('screen-' + name);
+  if (screen) {
+    screen.classList.add('active');
+    screen.classList.add('fade-enter');
+    setTimeout(() => screen.classList.remove('fade-enter'), 300);
+  }
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.dataset.screen === name) b.classList.add('active');
+  });
+
+  currentScreen = name;
+
+  // trigger renders on screen enter
+  if (name === 'retailer') renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
+  if (name === 'breakdown') renderBreakdown(currentGarment, profile2Active ? 'B' : 'A');
+  if (name === 'compare')   renderCompare(profile2Active ? 'B' : 'A');
+}
+
+// Nav buttons
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => goToScreen(btn.dataset.screen));
+});
+
+// Profile switcher (screen 1)
+document.querySelectorAll('.profile-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.profile-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentProfile = chip.dataset.profile;
+    renderRatioPanel(currentProfile);
+  });
+});
+
+// Garment switcher (screen 2)
+document.querySelectorAll('.garment-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.garment-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentGarment = chip.dataset.garment;
+    renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
+  });
+});
+
+// Profile 2 toggle
+document.getElementById('profile2-toggle').addEventListener('click', function() {
+  profile2Active = !profile2Active;
+  this.classList.toggle('active', profile2Active);
+  this.textContent = profile2Active ? 'Profile B: Petite / Fuller ✓' : 'Profile B: Petite / Fuller';
+  renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
+});
+
+// Overlay CTA also works via button
+document.querySelector('.overlay-cta').addEventListener('click', () => goToScreen('breakdown'));
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+renderRatioPanel('A');
+
+// Pre-fill form with demo values
+const demoA = profiles.A;
+document.getElementById('f-waist').value    = demoA.waist;
+document.getElementById('f-hip').value      = demoA.hip;
+document.getElementById('f-highhip').value  = demoA.highHip;
+document.getElementById('f-thigh').value    = demoA.thigh;
+document.getElementById('f-inseam').value   = demoA.inseam;
+document.getElementById('f-outseam').value  = demoA.outseam;
+document.getElementById('f-frontrise').value= demoA.frontRise;
+document.getElementById('f-backrise').value = demoA.backRise;
+document.getElementById('f-height').value   = demoA.height;
+document.getElementById('f-torso').value    = demoA.torso;
+</script>
+</body>
+</html>
