@@ -1033,9 +1033,343 @@ input { font-family: inherit; }
   .breakdown-hero { grid-template-columns: 1fr; }
   .breakdown-score-block { text-align: left; }
 }
+
+/* ─── ONBOARDING SCREEN ───────────────────────────────────────────────── */
+#screen-onboarding {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: var(--ink);
+  padding: 64px 40px;
+  text-align: center;
+}
+#screen-onboarding.active { display: flex; }
+.onboard-logo {
+  font-family: var(--font-display);
+  font-size: 72px;
+  letter-spacing: 6px;
+  color: var(--paper);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.onboard-logo-dot {
+  width: 14px; height: 14px;
+  background: var(--pink);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.onboard-tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 22px;
+  color: rgba(255,250,247,0.5);
+  margin-bottom: 64px;
+  max-width: 480px;
+}
+.onboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  max-width: 780px;
+  width: 100%;
+  border: 2px solid rgba(255,250,247,0.12);
+  margin-bottom: 56px;
+}
+.onboard-card {
+  padding: 28px 24px;
+  border-right: 2px solid rgba(255,250,247,0.08);
+  text-align: left;
+}
+.onboard-card:last-child { border-right: none; }
+.onboard-card-num {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--yellow);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.onboard-card-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper);
+  margin-bottom: 8px;
+}
+.onboard-card-desc {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: rgba(255,250,247,0.45);
+  line-height: 1.6;
+}
+.onboard-cta {
+  padding: 18px 48px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--paper);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+  margin-bottom: 24px;
+}
+.onboard-cta:hover { background: var(--yellow); border-color: var(--yellow); }
+.onboard-skip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,250,247,0.22);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+.onboard-skip:hover { color: rgba(255,250,247,0.5); }
+
+/* ─── MEASUREMENT TOOLTIP ─────────────────────────────────────────────── */
+.field-wrap { position: relative; }
+.field-help {
+  position: absolute;
+  top: 16px;
+  right: 8px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(26,10,18,0.08);
+  border: 1px solid rgba(26,10,18,0.15);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ink);
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 150ms ease, background 150ms ease;
+  z-index: 2;
+}
+.field-help:hover { opacity: 1; background: var(--blue-tint); border-color: var(--blue); }
+
+.tooltip-panel {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 300;
+  width: 360px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.tooltip-panel.visible { display: block; animation: fadeUp 180ms ease forwards; }
+.tooltip-header {
+  background: var(--ink);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tooltip-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+.tooltip-close {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: rgba(255,250,247,0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 150ms ease;
+}
+.tooltip-close:hover { color: var(--pink); }
+.tooltip-body {
+  padding: 20px 24px;
+}
+.tooltip-body p {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+  opacity: 0.75;
+  margin-bottom: 12px;
+}
+.tooltip-body p:last-child { margin-bottom: 0; }
+.tooltip-body strong {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--blue);
+  font-style: normal;
+  display: block;
+  margin-bottom: 4px;
+}
+.tooltip-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,10,18,0.4);
+  z-index: 299;
+}
+.tooltip-overlay.visible { display: block; }
+
+/* ─── LOADING STATE ────────────────────────────────────────────────────── */
+.loading-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--blue);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 400ms ease;
+}
+.loading-bar.animating {
+  animation: loadBar 480ms ease forwards;
+}
+@keyframes loadBar {
+  0%   { transform: scaleX(0); opacity: 1; }
+  70%  { transform: scaleX(0.85); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+.loading-label {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--blue);
+  opacity: 0;
+  pointer-events: none;
+}
+.loading-label.visible {
+  display: block;
+  animation: loadLabel 480ms ease forwards;
+}
+@keyframes loadLabel {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.7; }
+  80%  { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+/* ─── COMING SOON ROW ─────────────────────────────────────────────────── */
+.dim-row-coming-soon {
+  display: grid;
+  grid-template-columns: 1fr 140px 36px;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: var(--border-thin);
+  align-items: center;
+  background: var(--yellow-tint);
+}
+.coming-soon-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--yellow-shade);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid var(--yellow);
+  margin-top: 4px;
+}
+.coming-soon-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--yellow-shade);
+  flex-shrink: 0;
+}
+
+/* ─── SCORE COUNT-UP ───────────────────────────────────────────────────── */
+.score-counting {
+  transition: none !important;
+}
+
+/* ─── MOBILE ──────────────────────────────────────────────────────────── */
+@media (max-width: 700px) {
+  .app-nav { padding: 0 16px; }
+  .nav-links { gap: 0; overflow-x: auto; }
+  .nav-btn { padding: 0 12px; font-size: 9px; letter-spacing: 2px; }
+  .nav-badge { display: none; }
+  .onboard-cards { grid-template-columns: 1fr; }
+  .onboard-card { border-right: none; border-bottom: 2px solid rgba(255,250,247,0.08); }
+  .onboard-logo { font-size: 48px; }
+  .profile-left, .profile-right { padding: 32px 20px; }
+  .presenter-bar { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
+  .retailer-product { padding: 24px 16px; }
+  .retailer-nav { padding: 0 16px; }
+  #screen-breakdown { padding: 40px 20px; }
+  #screen-compare { padding: 40px 20px; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .compare-col { border-right: none; border-bottom: var(--border); }
+  .breakdown-hero { grid-template-columns: 1fr; }
+  .breakdown-score-block { text-align: left; }
+  .dim-table-header, .dim-row { grid-template-columns: 1fr 100px 28px; }
+  .dim-bar-track { width: 80px; }
+  .tooltip-panel { width: calc(100vw - 32px); }
+}
 </style>
 </head>
 <body>
+
+
+<!-- ══ TOOLTIP OVERLAY ═══════════════════════════════════════════════════ -->
+<div class="tooltip-overlay" id="tooltip-overlay"></div>
+<div class="tooltip-panel" id="tooltip-panel">
+  <div class="tooltip-header">
+    <span class="tooltip-title" id="tooltip-title">How to measure</span>
+    <button class="tooltip-close" id="tooltip-close">✕</button>
+  </div>
+  <div class="tooltip-body" id="tooltip-body"></div>
+</div>
+
+<!-- ══ ONBOARDING ════════════════════════════════════════════════════════ -->
+<div id="screen-onboarding" class="screen active">
+  <div class="onboard-logo">
+    <div class="onboard-logo-dot"></div>
+    FITCHECK
+  </div>
+  <div class="onboard-tagline">Garment fit scored against your proportions — not your size label.</div>
+
+  <div class="onboard-cards">
+    <div class="onboard-card">
+      <div class="onboard-card-num">01</div>
+      <div class="onboard-card-title">Enter your measurements</div>
+      <div class="onboard-card-desc">14 body measurements in cm. We derive 7 proportion ratios — including the front-to-back rise ratio no other tool scores.</div>
+    </div>
+    <div class="onboard-card">
+      <div class="onboard-card-num">02</div>
+      <div class="onboard-card-title">Browse any retailer</div>
+      <div class="onboard-card-desc">FitCheck reads the size guide in real time and scores each garment dimension independently against your proportions.</div>
+    </div>
+    <div class="onboard-card">
+      <div class="onboard-card-num">03</div>
+      <div class="onboard-card-title">See the full breakdown</div>
+      <div class="onboard-card-desc">Not just a size recommendation — a scored breakdown of every dimension, with a plain explanation of what fits and what doesn't.</div>
+    </div>
+  </div>
+
+  <button class="onboard-cta" id="onboard-start">Enter your measurements →</button>
+  <button class="onboard-skip" id="onboard-skip">Skip — use demo profile</button>
+</div>
 
 <!-- ══ GLOBAL NAV ══════════════════════════════════════════════════════════ -->
 <nav class="app-nav">
@@ -1044,7 +1378,7 @@ input { font-family: inherit; }
     FITCHECK
   </div>
   <div class="nav-links">
-    <button class="nav-btn active" data-screen="profile">01 — Profile</button>
+    <button class="nav-btn" data-screen="profile">01 — Profile</button>
     <button class="nav-btn" data-screen="retailer">02 — In-Store</button>
     <button class="nav-btn" data-screen="breakdown">03 — Breakdown</button>
     <button class="nav-btn" data-screen="compare">04 — Compare</button>
@@ -1062,9 +1396,11 @@ input { font-family: inherit; }
     <div class="section-sub">Not your size — your proportions.</div>
 
     <div class="profile-switcher">
-      <button class="profile-chip active" data-profile="A">Demo Profile A<br><span style="opacity:.5;font-size:8px;">Tall · Curvy</span></button>
-      <button class="profile-chip" data-profile="B">Demo Profile B<br><span style="opacity:.5;font-size:8px;">Petite · Fuller</span></button>
+      <button class="profile-chip active" data-profile="A">Demo A<br><span style="opacity:.5;font-size:8px;">Tall · Curvy</span></button>
+      <button class="profile-chip" data-profile="B">Demo B<br><span style="opacity:.5;font-size:8px;">Petite · Fuller</span></button>
+      <button class="profile-chip" data-profile="custom" id="chip-custom">Your Measurements<br><span style="opacity:.5;font-size:8px;">Edit fields below</span></button>
     </div>
+    <div id="profile-validation-msg" style="display:none;font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);margin-bottom:16px;padding:10px 14px;background:var(--red-tint);border-left:3px solid var(--red);">Fill in all fields to use your measurements.</div>
 
     <!-- Lower Body -->
     <div class="form-section">
@@ -1075,34 +1411,42 @@ input { font-family: inherit; }
       <div class="form-fields">
         <div class="field-wrap">
           <label class="field-label">Waist <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-waist" aria-label="How to measure Waist">?</button>
           <input class="field-input" id="f-waist" type="number" placeholder="72">
         </div>
         <div class="field-wrap">
           <label class="field-label">Hip <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-hip" aria-label="How to measure Hip">?</button>
           <input class="field-input" id="f-hip" type="number" placeholder="104">
         </div>
         <div class="field-wrap">
           <label class="field-label">High Hip <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-highhip" aria-label="How to measure High Hip">?</button>
           <input class="field-input" id="f-highhip" type="number" placeholder="91">
         </div>
         <div class="field-wrap">
           <label class="field-label">Thigh <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-thigh" aria-label="How to measure Thigh">?</button>
           <input class="field-input" id="f-thigh" type="number" placeholder="62">
         </div>
         <div class="field-wrap">
           <label class="field-label">Inseam <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-inseam" aria-label="How to measure Inseam">?</button>
           <input class="field-input" id="f-inseam" type="number" placeholder="82">
         </div>
         <div class="field-wrap">
           <label class="field-label">Outseam <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-outseam" aria-label="How to measure Outseam">?</button>
           <input class="field-input" id="f-outseam" type="number" placeholder="108">
         </div>
         <div class="field-wrap">
           <label class="field-label">Front Rise <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-frontrise" aria-label="How to measure Front Rise">?</button>
           <input class="field-input" id="f-frontrise" type="number" placeholder="24">
         </div>
         <div class="field-wrap">
           <label class="field-label">Back Rise <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-backrise" aria-label="How to measure Back Rise">?</button>
           <input class="field-input" id="f-backrise" type="number" placeholder="29">
         </div>
       </div>
@@ -1117,10 +1461,12 @@ input { font-family: inherit; }
       <div class="form-fields">
         <div class="field-wrap">
           <label class="field-label">Height <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-height" aria-label="How to measure Height">?</button>
           <input class="field-input" id="f-height" type="number" placeholder="174">
         </div>
         <div class="field-wrap">
           <label class="field-label">Torso Length <span class="field-unit">cm</span></label>
+          <button class="field-help" data-help="f-torso" aria-label="How to measure Torso Length">?</button>
           <input class="field-input" id="f-torso" type="number" placeholder="58">
         </div>
       </div>
@@ -1155,10 +1501,10 @@ input { font-family: inherit; }
   <!-- Presenter controls -->
   <div class="presenter-bar">
     <span class="presenter-label">Garment</span>
-    <button class="garment-chip active" data-garment="nadia">The Nadia <span class="chip-score">82</span></button>
-    <button class="garment-chip" data-garment="celeste">The Celeste <span class="chip-score">54</span></button>
-    <button class="garment-chip" data-garment="kama">The Kama <span class="chip-score">91</span></button>
-    <button class="profile2-btn" id="profile2-toggle">Profile B: Petite / Fuller</button>
+    <button class="garment-chip active" data-garment="nadia">The Nadia <span class="chip-score" id="chip-nadia">—</span></button>
+    <button class="garment-chip" data-garment="celeste">The Celeste <span class="chip-score" id="chip-celeste">—</span></button>
+    <button class="garment-chip" data-garment="kama">The Kama <span class="chip-score" id="chip-kama">—</span></button>
+    <span id="active-profile-label" style="margin-left:auto;font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,250,247,0.35);"></span>
   </div>
 
   <!-- Mock retailer nav -->
@@ -1193,7 +1539,9 @@ input { font-family: inherit; }
       </select>
 
       <!-- FitCheck overlay (injected) -->
-      <div class="fitcheck-overlay" id="fitcheck-overlay">
+      <div class="fitcheck-overlay" id="fitcheck-overlay" style="position:relative;">
+      <div class="loading-bar" id="overlay-loading-bar"></div>
+      <div class="loading-label" id="overlay-loading-label">Analysing fit...</div>
         <div class="overlay-header">
           <span class="overlay-brand">FITCHECK</span>
           <div class="overlay-brand-dot"></div>
@@ -1305,16 +1653,22 @@ input { font-family: inherit; }
 // ── DATA ────────────────────────────────────────────────────────────────────
 const profiles = {
   A: {
-    label: "Demo Profile A — Tall, Curvy",
+    label: "Demo A — Tall, Curvy",
     waist: 72, hip: 104, highHip: 91, thigh: 62,
     inseam: 82, outseam: 108, frontRise: 24, backRise: 29,
     height: 174, torso: 58
   },
   B: {
-    label: "Demo Profile B — Petite, Fuller",
+    label: "Demo B — Petite, Fuller",
     waist: 76, hip: 106, highHip: 94, thigh: 67,
     inseam: 69, outseam: 94, frontRise: 22, backRise: 28,
     height: 158, torso: 52
+  },
+  custom: {
+    label: "Your Measurements",
+    waist: 72, hip: 104, highHip: 91, thigh: 62,
+    inseam: 82, outseam: 108, frontRise: 24, backRise: 29,
+    height: 174, torso: 58
   }
 };
 
@@ -1324,8 +1678,6 @@ const garments = {
     sub: "SKU FERNE-NADIA-001 · Straight Leg · Indigo",
     imgLabel: "Straight Leg · Indigo Wash",
     price: "$198",
-    category: "pants",
-    // flat measurements (cm), then stretch
     waistFlat: 34, waistStretch: 41,
     hipFlat: 49, hipStretch: 56,
     thighFlat: 28.5, thighStretch: 33,
@@ -1333,16 +1685,13 @@ const garments = {
     inseam: 78, inseamTall: 84,
     offersTall: true,
     fabric: "98% Cotton, 2% Elastane",
-    confidence: 0.88,
-    source: "Brand API",
-    verified: "3 days ago",
+    confidence: 0.88, source: "Brand API", verified: "3 days ago"
   },
   celeste: {
     name: "The Celeste Wide-Leg Trouser",
     sub: "SKU FERNE-CELESTE-003 · Wide Leg · Black",
     imgLabel: "Wide Leg · Black",
     price: "$224",
-    category: "pants",
     waistFlat: 33, waistStretch: 35,
     hipFlat: 46, hipStretch: 49,
     thighFlat: 33, thighStretch: 36,
@@ -1350,16 +1699,13 @@ const garments = {
     inseam: 82,
     offersTall: false,
     fabric: "100% Wool Crepe",
-    confidence: 0.72,
-    source: "Size Guide (scraped)",
-    verified: "11 days ago",
+    confidence: 0.72, source: "Size Guide (scraped)", verified: "11 days ago"
   },
   kama: {
     name: "The Kama Relaxed Straight",
     sub: "SKU FERNE-KAMA-007 · Relaxed Straight · Ecru",
     imgLabel: "Relaxed Straight · Ecru",
     price: "$186",
-    category: "pants",
     waistFlat: 34.5, waistStretch: 43,
     hipFlat: 51, hipStretch: 59,
     thighFlat: 30, thighStretch: 36,
@@ -1367,19 +1713,57 @@ const garments = {
     inseam: 80, inseamTall: 86,
     offersTall: true,
     fabric: "92% Cotton, 8% Elastane",
-    confidence: 0.91,
-    source: "Brand API",
-    verified: "1 day ago",
+    confidence: 0.91, source: "Brand API", verified: "1 day ago"
   }
 };
 
-// ── STATE ───────────────────────────────────────────────────────────────────
-let currentScreen   = 'profile';
-let currentGarment  = 'nadia';
-let currentProfile  = 'A';
-let profile2Active  = false;
+// ── STATE ────────────────────────────────────────────────────────────────────
+let currentScreen  = 'profile';
+let currentGarment = 'nadia';
+let currentProfile = 'custom';
 
-// ── SCORE ENGINE ────────────────────────────────────────────────────────────
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function getActiveProfile() { return profiles[currentProfile]; }
+
+function readFormValues() {
+  const v = (id, fallback) => {
+    const n = parseFloat(document.getElementById(id)?.value);
+    return isNaN(n) ? fallback : n;
+  };
+  return {
+    waist:     v('f-waist',     profiles.A.waist),
+    hip:       v('f-hip',       profiles.A.hip),
+    highHip:   v('f-highhip',   profiles.A.highHip),
+    thigh:     v('f-thigh',     profiles.A.thigh),
+    inseam:    v('f-inseam',    profiles.A.inseam),
+    outseam:   v('f-outseam',   profiles.A.outseam),
+    frontRise: v('f-frontrise', profiles.A.frontRise),
+    backRise:  v('f-backrise',  profiles.A.backRise),
+    height:    v('f-height',    profiles.A.height),
+    torso:     v('f-torso',     profiles.A.torso),
+  };
+}
+
+function fillForm(p) {
+  document.getElementById('f-waist').value     = p.waist;
+  document.getElementById('f-hip').value       = p.hip;
+  document.getElementById('f-highhip').value   = p.highHip;
+  document.getElementById('f-thigh').value     = p.thigh;
+  document.getElementById('f-inseam').value    = p.inseam;
+  document.getElementById('f-outseam').value   = p.outseam;
+  document.getElementById('f-frontrise').value = p.frontRise;
+  document.getElementById('f-backrise').value  = p.backRise;
+  document.getElementById('f-height').value    = p.height;
+  document.getElementById('f-torso').value     = p.torso;
+}
+
+function profileLabel(key) {
+  return { custom: 'Your Measurements', A: 'Demo A', B: 'Demo B' }[key] || key;
+}
+
+// ── SCORE ENGINE ─────────────────────────────────────────────────────────────
+function round2(n) { return Math.round(n * 100) / 100; }
+
 function deriveRatios(p) {
   return {
     waistToHip:        round2(p.waist / p.hip),
@@ -1392,13 +1776,9 @@ function deriveRatios(p) {
   };
 }
 
-function round2(n) { return Math.round(n * 100) / 100; }
-
 function computeFitWindow(flat, stretch) {
-  // flat measurement → circumference range
   const stretchPct = stretch ? (stretch - flat) / flat : 0;
-  const ease = 1.5; // standard ease allowance cm
-  const min = (flat * 2) - ease;
+  const min = (flat * 2) - 1.5;
   const max = (flat * (1 + stretchPct)) * 2;
   return { min, max };
 }
@@ -1407,114 +1787,102 @@ function scoreDimension(actual, min, max, isRise = false) {
   if (actual >= min && actual <= max) return 1.0;
   const boundary = actual < min ? min : max;
   const delta = Math.abs(actual - boundary);
-  const decay = isRise ? 2.5 : 2.0;
-  return Math.max(0, 1 - ((delta / boundary) * decay));
+  return Math.max(0, 1 - ((delta / boundary) * (isRise ? 2.5 : 2.0)));
 }
 
 function scoreGarment(profile, garment) {
-  const p = profile;
-  const g = garment;
+  const p = profile, g = garment;
   const weights = { waist: 0.25, hip: 0.20, rise: 0.25, thigh: 0.15, inseam: 0.15 };
 
-  // waist
-  const waistWin = computeFitWindow(g.waistFlat, g.waistStretch);
-  const waistScore = scoreDimension(p.waist, waistWin.min, waistWin.max);
+  const waistWin  = computeFitWindow(g.waistFlat, g.waistStretch);
+  const hipWin    = computeFitWindow(g.hipFlat, g.hipStretch);
+  const thighWin  = computeFitWindow(g.thighFlat, g.thighStretch);
 
-  // hip
-  const hipWin = computeFitWindow(g.hipFlat, g.hipStretch);
-  const hipScore = scoreDimension(p.hip, hipWin.min, hipWin.max);
+  const waistScore  = scoreDimension(p.waist, waistWin.min, waistWin.max);
+  const hipScore    = scoreDimension(p.hip,   hipWin.min,   hipWin.max);
+  const thighScore  = scoreDimension(p.thigh, thighWin.min, thighWin.max);
+  const riseScore   = scoreDimension(p.frontRise, g.frontRise-2, g.frontRise+3, true)*0.5
+                    + scoreDimension(p.backRise,  g.backRise-2,  g.backRise+4,  true)*0.5;
+  const effInseam   = g.offersTall ? (g.inseamTall || g.inseam) : g.inseam;
+  const inseamScore = scoreDimension(p.inseam, effInseam-4, effInseam+2);
 
-  // thigh
-  const thighWin = computeFitWindow(g.thighFlat, g.thighStretch);
-  const thighScore = scoreDimension(p.thigh, thighWin.min, thighWin.max);
+  const raw = waistScore*weights.waist + hipScore*weights.hip + riseScore*weights.rise
+            + thighScore*weights.thigh + inseamScore*weights.inseam;
 
-  // rise (front+back combined, ratio aware)
-  const riseScore = scoreDimension(p.frontRise, g.frontRise - 2, g.frontRise + 3, true) * 0.5
-                  + scoreDimension(p.backRise,  g.backRise  - 2, g.backRise  + 4, true) * 0.5;
+  const total = Math.round(raw * (g.confidence * 0.7 + 0.3) * 100);
 
-  // inseam (independent — length vs girth never averaged)
-  const effectiveInseam = g.offersTall ? (g.inseamTall || g.inseam) : g.inseam;
-  const inseamScore = scoreDimension(p.inseam, effectiveInseam - 4, effectiveInseam + 2);
-
-  const raw = waistScore * weights.waist
-            + hipScore   * weights.hip
-            + riseScore  * weights.rise
-            + thighScore * weights.thigh
-            + inseamScore * weights.inseam;
-
-  const confidence = g.confidence;
-  const adjusted = raw * (confidence * 0.7 + 0.3);
-  const final = Math.round(adjusted * 100);
+  const signalTxt = (actual, win) => {
+    if (actual >= win.min && actual <= win.max) return 'Fits your proportions well';
+    return actual < win.min ? 'Garment runs large' : 'Garment runs small — may feel tight';
+  };
+  const riseSignal = () => {
+    if (Math.abs(p.frontRise-g.frontRise)<=2 && Math.abs(p.backRise-g.backRise)<=3)
+      return 'Rise matches your front-back ratio';
+    if (Math.abs(p.backRise-g.backRise)>3) return 'Back rise may sit too low or high';
+    return 'Front rise slightly off your ratio';
+  };
+  const inseamSignal = () => {
+    const diff = p.inseam - effInseam;
+    if (Math.abs(diff)<=3) return 'Inseam aligns with your leg length';
+    if (diff>3) return `May run ${Math.round(diff)}cm short${g.offersTall?' — tall option available':''}`;
+    return `May run ${Math.round(-diff)}cm long for your frame`;
+  };
 
   return {
-    total: final,
+    total,
     dims: [
-      { key: 'waist',  label: 'Waist',       score: waistScore,  signal: signalText('waist', p.waist, waistWin) },
-      { key: 'hip',    label: 'Hip / Seat',   score: hipScore,    signal: signalText('hip',   p.hip,   hipWin) },
-      { key: 'thigh',  label: 'Thigh',        score: thighScore,  signal: signalText('thigh', p.thigh, thighWin) },
-      { key: 'rise',   label: 'Front / Back Rise', score: riseScore, signal: riseSignal(p, g) },
-      { key: 'inseam', label: 'Inseam',       score: inseamScore, signal: inseamSignal(p, g), independent: true },
+      { key:'waist',  label:'Waist',            score:waistScore,  signal:signalTxt(p.waist,waistWin) },
+      { key:'hip',    label:'Hip / Seat',        score:hipScore,    signal:signalTxt(p.hip,hipWin) },
+      { key:'thigh',  label:'Thigh',             score:thighScore,  signal:signalTxt(p.thigh,thighWin) },
+      { key:'rise',   label:'Front / Back Rise', score:riseScore,   signal:riseSignal() },
+      { key:'inseam', label:'Inseam',            score:inseamScore, signal:inseamSignal(), independent:true },
     ]
   };
 }
 
-function signalText(dim, actual, win) {
-  if (actual >= win.min && actual <= win.max) return 'Fits your proportions well';
-  if (actual < win.min) return 'Garment runs large for this dimension';
-  return 'Garment runs small — may feel tight';
-}
-function riseSignal(p, g) {
-  const frontOk = Math.abs(p.frontRise - g.frontRise) <= 2;
-  const backOk  = Math.abs(p.backRise  - g.backRise)  <= 3;
-  if (frontOk && backOk) return 'Rise proportion matches your front-back ratio';
-  if (!backOk) return 'Back rise may sit too low or too high for your seat';
-  return 'Front rise slightly off your proportion ratio';
-}
-function inseamSignal(p, g) {
-  const eff = g.offersTall ? (g.inseamTall || g.inseam) : g.inseam;
-  const diff = p.inseam - eff;
-  if (Math.abs(diff) <= 3) return 'Inseam aligns with your leg length';
-  if (diff > 3) return `May run ${Math.round(diff)}cm short — tall option ${g.offersTall ? 'available' : 'not available'}`;
-  return `May run ${Math.round(-diff)}cm long for your frame`;
+function dynamicSummary(result, garmentKey) {
+  const score = result.total;
+  const g = garments[garmentKey];
+  const worst = [...result.dims].sort((a,b) => a.score-b.score)[0];
+  const best  = [...result.dims].sort((a,b) => b.score-a.score)[0];
+  if (score >= 80) {
+    const tall = g.offersTall ? ' Tall inseam option available.' : '';
+    return `Good overall match — ${best.label.toLowerCase()} aligns particularly well.${tall}`;
+  }
+  if (score >= 60) return `Mostly compatible but ${worst.label.toLowerCase()} may be a friction point. Check the breakdown.`;
+  if (score >= 40) return `Mixed result — ${worst.label.toLowerCase()} doesn't align well. Read the breakdown before ordering.`;
+  return `Significant mismatch in ${worst.label.toLowerCase()}. This garment is unlikely to fit your proportions comfortably.`;
 }
 
-function scoreColor(score) {
-  if (score >= 80) return 'var(--green)';
-  if (score >= 60) return 'var(--yellow-shade)';
-  if (score >= 40) return 'var(--yellow-shade)';
-  return 'var(--red)';
+function dynamicRec(result, garmentKey) {
+  const score = result.total;
+  const g = garments[garmentKey];
+  if (score >= 80) return g.offersTall ? 'Good match — request the tall inseam if available.' : 'Good match for your proportions.';
+  if (score >= 60) return 'Partial match — review the dimension breakdown before buying.';
+  return 'Significant proportion mismatch — consider a different garment.';
 }
-function scoreLabel(score) {
-  if (score >= 80) return 'Good Match';
-  if (score >= 60) return 'Fair Match';
-  if (score >= 40) return 'Mixed';
-  return 'Poor Match';
-}
-function dimScoreColor(s) {
-  if (s >= 0.75) return 'var(--green)';
-  if (s >= 0.50) return 'var(--yellow-shade)';
-  if (s >= 0.30) return 'var(--yellow-shade)';
-  return 'var(--red)';
-}
+
+function scoreColor(s) { return s>=80?'var(--green)':s>=40?'var(--yellow-shade)':'var(--red)'; }
+function scoreLabel(s) { return s>=80?'Good Match':s>=60?'Fair Match':s>=40?'Mixed':'Poor Match'; }
+function dimScoreColor(s) { return s>=0.75?'var(--green)':s>=0.40?'var(--yellow-shade)':'var(--red)'; }
 function dimIcon(s) {
-  if (s >= 0.75) return '<span class="icon-pass">✓</span>';
-  if (s >= 0.40) return '<span class="icon-warn">↓</span>';
+  if (s>=0.75) return '<span class="icon-pass">✓</span>';
+  if (s>=0.40) return '<span class="icon-warn">↓</span>';
   return '<span class="icon-fail">↕</span>';
 }
 
-// ── RATIO LABELS ────────────────────────────────────────────────────────────
+// ── RATIO LABELS ─────────────────────────────────────────────────────────────
 const ratioMeta = [
-  { key:'waistToHip',    label:'Waist to Hip',           sub:'Core proportion indicator', ip: false },
-  { key:'highHipToHip',  label:'High Hip to Hip',        sub:'Seat curve entry', ip: false },
-  { key:'thighToHip',    label:'Thigh to Hip',           sub:'Lower body fullness', ip: false },
-  { key:'frontBackRise', label:'Front to Back Rise',     sub:'★ Seat depth ratio', ip: true },
-  { key:'inseamToHeight',label:'Inseam to Height',       sub:'Leg-to-torso proportion', ip: false },
-  { key:'inseamToWaist', label:'Inseam to Waist',        sub:'★ Length–girth independence', ip: true },
-  { key:'torsoToLeg',    label:'Torso to Leg',           sub:'Vertical proportion split', ip: false },
+  { key:'waistToHip',     label:'Waist to Hip',        sub:'Core proportion indicator',    ip:false },
+  { key:'highHipToHip',   label:'High Hip to Hip',     sub:'Seat curve entry',             ip:false },
+  { key:'thighToHip',     label:'Thigh to Hip',        sub:'Lower body fullness',          ip:false },
+  { key:'frontBackRise',  label:'Front to Back Rise',  sub:'★ Seat depth ratio',           ip:true  },
+  { key:'inseamToHeight', label:'Inseam to Height',    sub:'Leg-to-torso proportion',      ip:false },
+  { key:'inseamToWaist',  label:'Inseam to Waist',     sub:'★ Length–girth independence',  ip:true  },
+  { key:'torsoToLeg',     label:'Torso to Leg',        sub:'Vertical proportion split',    ip:false },
 ];
 
-// ── RENDER FUNCTIONS ─────────────────────────────────────────────────────────
-
+// ── RENDERS ───────────────────────────────────────────────────────────────────
 function renderRatioPanel(profileKey) {
   const p = profiles[profileKey];
   const ratios = deriveRatios(p);
@@ -1527,266 +1895,409 @@ function renderRatioPanel(profileKey) {
     row.className = 'ratio-row' + (r.ip ? ' highlight' : '');
     row.innerHTML = `
       <div>
-        <div class="ratio-label">${r.label}${r.ip ? ' <span class="ratio-star">★ IP</span>' : ''}</div>
+        <div class="ratio-label">${r.label}${r.ip?' <span class="ratio-star">★ IP</span>':''}</div>
         <div class="ratio-sublabel">${r.sub}</div>
       </div>
       <div class="ratio-bar-wrap">
-        <div class="ratio-bar-track">
-          <div class="ratio-bar-fill" id="rbar-${r.key}" style="width:0%"></div>
-        </div>
+        <div class="ratio-bar-track"><div class="ratio-bar-fill" id="rbar-${r.key}" style="width:0%"></div></div>
         <div class="ratio-value">${val}</div>
-      </div>
-    `;
+      </div>`;
     container.appendChild(row);
-    setTimeout(() => {
-      const fill = document.getElementById('rbar-' + r.key);
-      if (fill) fill.style.width = pct + '%';
-    }, 80 + i * 60);
+    setTimeout(() => { const f=document.getElementById('rbar-'+r.key); if(f) f.style.width=pct+'%'; }, 80+i*60);
   });
+}
+
+function updateChipScores() {
+  ['nadia','celeste','kama'].forEach(k => {
+    const r = scoreGarment(getActiveProfile(), garments[k]);
+    const el = document.getElementById('chip-'+k);
+    if (el) el.textContent = r.total;
+  });
+  const lbl = document.getElementById('active-profile-label');
+  if (lbl) lbl.textContent = 'Scoring: ' + profileLabel(currentProfile);
 }
 
 function renderOverlay(garmentKey, profileKey) {
   const g = garments[garmentKey];
-  const p = profiles[profileKey];
-  const result = scoreGarment(p, g);
+  const result = scoreGarment(profiles[profileKey], g);
   const score = result.total;
-
-  const numEl   = document.getElementById('overlay-score-num');
-  const labelEl = document.getElementById('overlay-score-label');
-  const subEl   = document.getElementById('overlay-score-sublabel');
-  const sigsEl  = document.getElementById('overlay-signals');
-  const confEl  = document.getElementById('overlay-confidence');
-  const updEl   = document.getElementById('overlay-updated');
-
-  // Animate score number
   const ol = document.getElementById('fitcheck-overlay');
   ol.style.opacity = '0.4';
   setTimeout(() => {
-    numEl.textContent = score;
-    numEl.style.color = scoreColor(score);
-    labelEl.textContent = scoreLabel(score);
-    labelEl.style.color = scoreColor(score);
-
-    // summary sublabel
-    if (score >= 80) subEl.textContent = 'Works for your proportions in most dimensions.';
-    else if (score >= 60) subEl.textContent = 'Some dimensions align well; a few need attention.';
-    else if (score >= 40) subEl.textContent = 'Proportions partially compatible — read the breakdown.';
-    else subEl.textContent = 'Significant proportion mismatch — likely an uncomfortable fit.';
-
-    confEl.textContent = Math.round(g.confidence * 100) + '% Confidence · ' + g.source;
-    updEl.textContent = 'Last verified ' + g.verified;
-
-    // signals: top 3 dims
-    sigsEl.innerHTML = '';
-    result.dims.slice(0, 3).forEach(d => {
-      const div = document.createElement('div');
-      div.className = 'overlay-signal';
-      div.innerHTML = `<span class="signal-icon">${d.score >= 0.75 ? '✓' : d.score >= 0.40 ? '↓' : '↕'}</span>
-        <span style="color:${dimScoreColor(d.score)};margin-right:4px;">${d.label}:</span>
-        <span style="opacity:.7;">${d.signal}</span>`;
-      sigsEl.appendChild(div);
-    });
-
-    // product details
+    document.getElementById('overlay-score-num').textContent = score;
+    document.getElementById('overlay-score-num').style.color = scoreColor(score);
+    document.getElementById('overlay-score-label').textContent = scoreLabel(score);
+    document.getElementById('overlay-score-label').style.color = scoreColor(score);
+    const sub = score>=80?'Works for your proportions in most dimensions.'
+              : score>=60?'Some dimensions align well; a few need attention.'
+              : score>=40?'Proportions partially compatible — read the breakdown.'
+              : 'Significant proportion mismatch.';
+    document.getElementById('overlay-score-sublabel').textContent = sub;
+    document.getElementById('overlay-confidence').textContent = Math.round(g.confidence*100)+'% Confidence · '+g.source;
+    document.getElementById('overlay-updated').textContent = 'Last verified '+g.verified;
     document.getElementById('product-name').textContent = g.name;
     document.getElementById('product-sku').textContent = g.sub;
     document.getElementById('product-price').textContent = g.price;
     document.getElementById('product-img-label').textContent = g.imgLabel;
 
-    ol.style.opacity = '1';
-    ol.style.transition = 'opacity 200ms ease';
+    const sigsEl = document.getElementById('overlay-signals');
+    sigsEl.innerHTML = '';
+    result.dims.slice(0,3).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'overlay-signal';
+      div.innerHTML = `<span class="signal-icon">${d.score>=0.75?'✓':d.score>=0.40?'↓':'↕'}</span>
+        <span style="color:${dimScoreColor(d.score)};margin-right:4px;">${d.label}:</span>
+        <span style="opacity:.7;">${d.signal}</span>`;
+      sigsEl.appendChild(div);
+    });
+    updateChipScores();
+    ol.style.opacity='1'; ol.style.transition='opacity 200ms ease';
   }, 160);
 }
 
 function renderBreakdown(garmentKey, profileKey) {
   const g = garments[garmentKey];
-  const p = profiles[profileKey];
-  const result = scoreGarment(p, g);
+  const result = scoreGarment(profiles[profileKey], g);
   const score = result.total;
-
-  document.getElementById('breakdown-eyebrow').textContent = 'Fit Analysis — ' + g.name;
+  document.getElementById('breakdown-eyebrow').textContent = 'Fit Analysis — '+g.name;
   document.getElementById('breakdown-garment-name').textContent = g.name;
-  document.getElementById('breakdown-sku').textContent = 'FERNE · ' + g.sub.split('·')[0].trim() + ' · Size 27';
+  document.getElementById('breakdown-sku').textContent = 'FERNE · '+g.sub.split('·')[0].trim()+' · Size 27';
+  const numEl = document.getElementById('breakdown-score-num');
+  const lblEl = document.getElementById('breakdown-score-label');
+  numEl.textContent = score; numEl.style.color = scoreColor(score);
+  lblEl.textContent = scoreLabel(score); lblEl.style.color = scoreColor(score);
+  document.getElementById('breakdown-summary-text').textContent = dynamicSummary(result, garmentKey);
 
-  const numEl   = document.getElementById('breakdown-score-num');
-  const labelEl = document.getElementById('breakdown-score-label');
-  numEl.textContent = score;
-  numEl.style.color = scoreColor(score);
-  labelEl.textContent = scoreLabel(score);
-  labelEl.style.color = scoreColor(score);
-
-  const summaries = {
-    nadia: "This garment's construction aligns well with your proportions in most dimensions. The inseam may run slightly short for your frame — the tall option is available and recommended.",
-    celeste: "The Celeste's low-stretch construction creates tension at the hip and seat for your proportions. The rise placement doesn't map well to your front-back ratio.",
-    kama: "Excellent proportion match. The Kama's construction aligns with your waist-to-hip ratio and rise proportions. The tall inseam option is recommended."
-  };
-  document.getElementById('breakdown-summary-text').textContent = summaries[garmentKey];
-
-  // dimension rows
   const container = document.getElementById('dim-rows');
   container.innerHTML = '';
   result.dims.forEach((d, i) => {
     const pct = Math.round(d.score * 100);
     const row = document.createElement('div');
-    row.className = 'dim-row' + (i % 2 === 1 ? ' dim-row-alt' : '');
+    row.className = 'dim-row' + (i%2===1?' dim-row-alt':'');
     row.innerHTML = `
       <div>
-        <div class="dim-row-label">${d.label}${d.independent ? ' <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--blue);opacity:.6;text-transform:uppercase;"> — Independent</span>' : ''}</div>
+        <div class="dim-row-label">${d.label}${d.independent?' <span style="font-family:var(--font-mono);font-size:8px;letter-spacing:2px;color:var(--blue);opacity:.6;text-transform:uppercase;"> — Independent</span>':''}</div>
         <div class="dim-row-signal">${d.signal}</div>
       </div>
       <div class="dim-bar-wrap">
-        <div class="dim-bar-track">
-          <div class="dim-bar-fill" id="dbar-${d.key}" style="background:${dimScoreColor(d.score)};width:0%"></div>
-        </div>
+        <div class="dim-bar-track"><div class="dim-bar-fill" id="dbar-${d.key}" style="background:${dimScoreColor(d.score)};width:0%"></div></div>
         <div class="dim-score-val">${pct} / 100</div>
       </div>
-      <div class="dim-icon">${dimIcon(d.score)}</div>
-    `;
+      <div class="dim-icon">${dimIcon(d.score)}</div>`;
     container.appendChild(row);
-    setTimeout(() => {
-      const fill = document.getElementById('dbar-' + d.key);
-      if (fill) fill.style.width = pct + '%';
-    }, 100 + i * 80);
+    setTimeout(() => { const f=document.getElementById('dbar-'+d.key); if(f) f.style.width=pct+'%'; }, 100+i*80);
   });
 
-  // confidence
-  document.getElementById('conf-score-display').textContent = 'Confidence: ' + g.confidence.toFixed(2);
-  const confRows = document.getElementById('confidence-rows');
-  confRows.innerHTML = `
+  document.getElementById('conf-score-display').textContent = 'Confidence: '+g.confidence.toFixed(2);
+  document.getElementById('confidence-rows').innerHTML = `
+    <div class="conf-row"><span class="conf-key">Profile</span><span class="conf-val">${profileLabel(profileKey)}</span></div>
     <div class="conf-row"><span class="conf-key">Source</span><span class="conf-val">${g.source}</span></div>
     <div class="conf-row"><span class="conf-key">Last Verified</span><span class="conf-val">${g.verified}</span></div>
-    <div class="conf-row"><span class="conf-key">Fields Scored</span><span class="conf-val">5 of 5 dimensions</span></div>
-    <div class="conf-row"><span class="conf-key">Confidence</span><span class="conf-val"><span class="conf-badge high">● ${Math.round(g.confidence * 100)}% High</span></span></div>
-    <div class="conf-row"><span class="conf-key">Fabric</span><span class="conf-val">${g.fabric}</span></div>
-  `;
+    <div class="conf-row"><span class="conf-key">Fields Scored</span><span class="conf-val">5 of 5</span></div>
+    <div class="conf-row"><span class="conf-key">Confidence</span><span class="conf-val"><span class="conf-badge high">● ${Math.round(g.confidence*100)}% High</span></span></div>
+    <div class="conf-row"><span class="conf-key">Fabric</span><span class="conf-val">${g.fabric}</span></div>`;
 }
 
 function renderCompare(profileKey) {
   const p = profiles[profileKey];
-  const keys = ['nadia', 'celeste', 'kama'];
+  const keys = ['nadia','celeste','kama'];
   const results = {};
   keys.forEach(k => { results[k] = scoreGarment(p, garments[k]); });
-
-  const bestKey = keys.reduce((a, b) => results[a].total > results[b].total ? a : b);
+  const bestKey = keys.reduce((a,b) => results[a].total > results[b].total ? a : b);
   const grid = document.getElementById('compare-grid');
   grid.innerHTML = '';
-
   keys.forEach(k => {
     const g = garments[k];
     const r = results[k];
     const score = r.total;
-    const isBest = k === bestKey;
-    const isWorst = !isBest && score < 60;
-
+    const isBest = k===bestKey;
     const col = document.createElement('div');
-    col.className = 'compare-col' + (isWorst ? ' dimmed' : '');
-
-    const signals = r.dims.slice(0, 3).map(d =>
+    col.className = 'compare-col' + (!isBest && score<60 ? ' dimmed' : '');
+    const signals = r.dims.slice(0,3).map(d =>
       `<div class="compare-signal">
-        <span class="signal-icon" style="color:${dimScoreColor(d.score)}">${d.score >= 0.75 ? '✓' : d.score >= 0.40 ? '↓' : '↕'}</span>
+        <span class="signal-icon" style="color:${dimScoreColor(d.score)}">${d.score>=0.75?'✓':d.score>=0.40?'↓':'↕'}</span>
         <span style="font-size:12px;">${d.label}: <span style="opacity:.55">${d.signal}</span></span>
-      </div>`
-    ).join('');
-
-    const recs = {
-      nadia: 'Works well — request the tall inseam option.',
-      celeste: 'Significant hip and rise mismatch — skip this one.',
-      kama: 'Best match for your proportions. Try in-store.'
-    };
-
+      </div>`).join('');
     col.innerHTML = `
       <div class="compare-col-header">
-        ${isBest ? '<div class="best-badge">★ Best Match</div>' : '<div style="height:24px;margin-bottom:10px;"></div>'}
+        ${isBest?'<div class="best-badge">★ Best Match</div>':'<div style="height:24px;margin-bottom:10px;"></div>'}
         <div class="compare-garment-name">${g.name}</div>
-        <div class="compare-garment-sub">FERNE · ${g.sub.split('·')[1]?.trim() || 'Denim'}</div>
+        <div class="compare-garment-sub">FERNE · ${g.sub.split('·')[1]?.trim()||'Denim'}</div>
       </div>
       <div class="compare-score-block">
         <span class="compare-score-num" style="color:${scoreColor(score)}">${score}</span>
         <span class="compare-score-label" style="color:${scoreColor(score)}">${scoreLabel(score)}</span>
       </div>
       <div class="compare-signals">${signals}</div>
-      <div class="compare-recommendation">
-        <p>${recs[k]}</p>
-      </div>
-    `;
+      <div class="compare-recommendation"><p>${dynamicRec(r,k)}</p></div>`;
     grid.appendChild(col);
   });
 }
 
-// ── NAVIGATION ───────────────────────────────────────────────────────────────
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
 function goToScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-  const screen = document.getElementById('screen-' + name);
-  if (screen) {
-    screen.classList.add('active');
-    screen.classList.add('fade-enter');
-    setTimeout(() => screen.classList.remove('fade-enter'), 300);
-  }
-  document.querySelectorAll('.nav-btn').forEach(b => {
-    if (b.dataset.screen === name) b.classList.add('active');
-  });
-
+  const screen = document.getElementById('screen-'+name);
+  if (screen) { screen.classList.add('active'); screen.classList.add('fade-enter'); setTimeout(()=>screen.classList.remove('fade-enter'),300); }
+  document.querySelectorAll('.nav-btn').forEach(b => { if(b.dataset.screen===name) b.classList.add('active'); });
   currentScreen = name;
-
-  // trigger renders on screen enter
-  if (name === 'retailer') renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
-  if (name === 'breakdown') renderBreakdown(currentGarment, profile2Active ? 'B' : 'A');
-  if (name === 'compare')   renderCompare(profile2Active ? 'B' : 'A');
+  if (name==='retailer')  renderOverlay(currentGarment, currentProfile);
+  if (name==='breakdown') renderBreakdown(currentGarment, currentProfile);
+  if (name==='compare')   renderCompare(currentProfile);
 }
 
-// Nav buttons
+// ── EVENT LISTENERS ───────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => goToScreen(btn.dataset.screen));
 });
 
-// Profile switcher (screen 1)
 document.querySelectorAll('.profile-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.profile-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     currentProfile = chip.dataset.profile;
+    const statusEl = document.getElementById('profile-status');
+    if (currentProfile === 'custom') {
+      Object.assign(profiles.custom, readFormValues());
+      if (statusEl) statusEl.style.display = 'block';
+    } else {
+      if (statusEl) statusEl.style.display = 'none';
+      fillForm(profiles[currentProfile]);
+    }
     renderRatioPanel(currentProfile);
   });
 });
 
-// Garment switcher (screen 2)
+['f-waist','f-hip','f-highhip','f-thigh','f-inseam','f-outseam','f-frontrise','f-backrise','f-height','f-torso'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    if (currentProfile !== 'custom') {
+      document.querySelectorAll('.profile-chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('.profile-chip[data-profile="custom"]').classList.add('active');
+      currentProfile = 'custom';
+      const s = document.getElementById('profile-status');
+      if (s) s.style.display = 'block';
+    }
+    Object.assign(profiles.custom, readFormValues());
+    renderRatioPanel('custom');
+  });
+});
+
 document.querySelectorAll('.garment-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.garment-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     currentGarment = chip.dataset.garment;
-    renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
+    renderOverlay(currentGarment, currentProfile);
   });
 });
 
-// Profile 2 toggle
-document.getElementById('profile2-toggle').addEventListener('click', function() {
-  profile2Active = !profile2Active;
-  this.classList.toggle('active', profile2Active);
-  this.textContent = profile2Active ? 'Profile B: Petite / Fuller ✓' : 'Profile B: Petite / Fuller';
-  renderOverlay(currentGarment, profile2Active ? 'B' : 'A');
-});
-
-// Overlay CTA also works via button
 document.querySelector('.overlay-cta').addEventListener('click', () => goToScreen('breakdown'));
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
-renderRatioPanel('A');
+// ── COUNT-UP ANIMATION ────────────────────────────────────────────────────
+function animateCount(el, targetVal, duration, colorFn) {
+  const start = performance.now();
+  const from = 0;
+  el.classList.add('score-counting');
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + (targetVal - from) * eased);
+    el.textContent = current;
+    el.style.color = colorFn(current);
+    if (progress < 1) requestAnimationFrame(tick);
+    else { el.textContent = targetVal; el.classList.remove('score-counting'); }
+  }
+  requestAnimationFrame(tick);
+}
 
-// Pre-fill form with demo values
-const demoA = profiles.A;
-document.getElementById('f-waist').value    = demoA.waist;
-document.getElementById('f-hip').value      = demoA.hip;
-document.getElementById('f-highhip').value  = demoA.highHip;
-document.getElementById('f-thigh').value    = demoA.thigh;
-document.getElementById('f-inseam').value   = demoA.inseam;
-document.getElementById('f-outseam').value  = demoA.outseam;
-document.getElementById('f-frontrise').value= demoA.frontRise;
-document.getElementById('f-backrise').value = demoA.backRise;
-document.getElementById('f-height').value   = demoA.height;
-document.getElementById('f-torso').value    = demoA.torso;
+// ── LOADING STATE ─────────────────────────────────────────────────────────
+function showLoadingOverlay() {
+  const bar   = document.getElementById('overlay-loading-bar');
+  const label = document.getElementById('overlay-loading-label');
+  if (bar)   { bar.classList.remove('animating'); void bar.offsetWidth; bar.classList.add('animating'); }
+  if (label) { label.classList.remove('visible'); void label.offsetWidth; label.classList.add('visible'); }
+}
+
+// ── PATCH renderOverlay with count-up + loading ──────────────────────────
+const _origRenderOverlay = renderOverlay;
+renderOverlay = function(garmentKey, profileKey) {
+  showLoadingOverlay();
+  const g = garments[garmentKey];
+  const result = scoreGarment(profiles[profileKey], g);
+  const score  = result.total;
+
+  const ol = document.getElementById('fitcheck-overlay');
+  ol.style.opacity = '0.3';
+
+  setTimeout(() => {
+    document.getElementById('overlay-score-num').textContent = '0';
+    document.getElementById('overlay-score-label').textContent = 'Analysing...';
+    document.getElementById('overlay-score-label').style.color = 'rgba(26,10,18,0.3)';
+
+    const sub = score>=80 ? 'Works for your proportions in most dimensions.'
+              : score>=60 ? 'Some dimensions align well; a few need attention.'
+              : score>=40 ? 'Proportions partially compatible — read the breakdown.'
+              : 'Significant proportion mismatch.';
+    document.getElementById('overlay-score-sublabel').textContent = sub;
+    document.getElementById('overlay-confidence').textContent = Math.round(g.confidence*100)+'% Confidence · '+g.source;
+    document.getElementById('overlay-updated').textContent = 'Last verified '+g.verified;
+    document.getElementById('product-name').textContent = g.name;
+    document.getElementById('product-sku').textContent  = g.sub;
+    document.getElementById('product-price').textContent = g.price;
+    document.getElementById('product-img-label').textContent = g.imgLabel;
+
+    const sigsEl = document.getElementById('overlay-signals');
+    sigsEl.innerHTML = '';
+    result.dims.slice(0,3).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'overlay-signal';
+      div.innerHTML = `<span class="signal-icon">${d.score>=0.75?'✓':d.score>=0.40?'↓':'↕'}</span>
+        <span style="color:${dimScoreColor(d.score)};margin-right:4px;">${d.label}:</span>
+        <span style="opacity:.7;">${d.signal}</span>`;
+      sigsEl.appendChild(div);
+    });
+
+    updateChipScores();
+    ol.style.opacity = '1';
+    ol.style.transition = 'opacity 200ms ease';
+
+    // Animate score count-up
+    setTimeout(() => {
+      const numEl   = document.getElementById('overlay-score-num');
+      const labelEl = document.getElementById('overlay-score-label');
+      animateCount(numEl, score, 700, scoreColor);
+      setTimeout(() => {
+        labelEl.textContent = scoreLabel(score);
+        labelEl.style.color = scoreColor(score);
+      }, 350);
+    }, 80);
+
+  }, 200);
+};
+
+// ── PATCH renderBreakdown with count-up ──────────────────────────────────
+const _origRenderBreakdown = renderBreakdown;
+renderBreakdown = function(garmentKey, profileKey) {
+  _origRenderBreakdown(garmentKey, profileKey);
+  // Override the immediate score set with animated count
+  const result = scoreGarment(profiles[profileKey], garments[garmentKey]);
+  const numEl  = document.getElementById('breakdown-score-num');
+  numEl.textContent = '0';
+  setTimeout(() => animateCount(numEl, result.total, 900, scoreColor), 120);
+};
+
+// ── COMING SOON ROWS in breakdown ────────────────────────────────────────
+const _origRenderBreakdownBase = renderBreakdown;
+// Override dim-rows render to add coming soon for rise when on Tier 1
+function addComingSoonRows() {
+  const container = document.getElementById('dim-rows');
+  if (!container) return;
+  // After standard rows, append rise coming soon row if currentProfile === 'custom'
+  // and the profile was entered manually (not demo)
+  // For demo: rise is always scored. For custom: show coming soon for partner data
+  const rows = container.querySelectorAll('.dim-row');
+  rows.forEach(row => {
+    const labelEl = row.querySelector('.dim-row-label');
+    if (labelEl && labelEl.textContent.includes('Front / Back Rise')) {
+      // Add partner note below
+      const note = document.createElement('div');
+      note.style.cssText = 'font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--yellow-shade);margin-top:4px;opacity:.7;';
+      note.textContent = '★ Core IP — scored from partner data';
+      labelEl.parentElement.appendChild(note);
+    }
+  });
+}
+
+// ── TOOLTIP SYSTEM ────────────────────────────────────────────────────────
+const measureGuide = {
+  'f-waist':     { title: 'Waist', desc: '<strong>Where to measure</strong><p>Around the narrowest part of your natural waist, usually 2–3cm above your navel. Keep the tape snug but not tight — you should be able to slide two fingers underneath.</p>' },
+  'f-hip':       { title: 'Hip (Full)', desc: '<strong>Where to measure</strong><p>Around the fullest part of your hips and seat — usually 18–23cm below your natural waist. This is your widest point. Keep the tape parallel to the floor.</p>' },
+  'f-highhip':   { title: 'High Hip', desc: '<strong>Where to measure</strong><p>About 7–9cm below your natural waist, at the top of your hip curve. This is above the fullest hip point and helps score how a waistband entry fits.</p>' },
+  'f-thigh':     { title: 'Thigh', desc: '<strong>Where to measure</strong><p>Around the fullest part of your upper thigh, close to your crotch. Stand with feet hip-width apart and keep the tape parallel to the floor.</p>' },
+  'f-inseam':    { title: 'Inseam', desc: '<strong>Where to measure</strong><p>From your crotch seam down to where you want your trousers to end — usually the ankle bone. Stand straight against a wall. A second person makes this easier.</p><strong>Why it matters</strong><p>FitCheck scores inseam independently and never averages it with waist — the length-girth independence that most tools miss.</p>' },
+  'f-outseam':   { title: 'Outseam', desc: '<strong>Where to measure</strong><p>From your natural waist down the outside of your leg to the same ankle point as your inseam. Used alongside inseam to calculate your torso-to-leg ratio.</p>' },
+  'f-frontrise': { title: 'Front Rise ★', desc: '<strong>Where to measure</strong><p>The distance from your crotch seam to the top of the waistband at the front of your trousers. Easiest method: sit on a hard chair in your best-fitting trousers and measure from the waistband to the seat of the chair.</p><strong>Why this is the core IP</strong><p>Front-to-back rise ratio determines where a waistband actually sits on your body. No other fit tool scores this as an independent dimension.</p>' },
+  'f-backrise':  { title: 'Back Rise ★', desc: '<strong>Where to measure</strong><p>Same method as front rise, measured at the back. Sit on a hard chair and measure from the back waistband to the seat. Usually 4–6cm longer than front rise.</p><strong>Why it matters</strong><p>Together with front rise, this ratio determines whether the seat of trousers fits your actual seat depth — the dimension that explains seat gapping and waistband pulling.</p>' },
+  'f-height':    { title: 'Height', desc: '<strong>Where to measure</strong><p>Your full standing height without shoes. Stand against a wall, feet flat and together, looking straight ahead. Mark the wall and measure to the floor.</p>' },
+  'f-torso':     { title: 'Torso Length', desc: '<strong>Where to measure</strong><p>From the prominent bone at the back of your neck (C7 — tilt your head forward to find it) down your spine to your natural waist. Used to calculate your torso-to-leg proportion ratio.</p>' },
+};
+
+document.querySelectorAll('.field-help').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const fieldId = btn.dataset.help;
+    const guide   = measureGuide[fieldId];
+    if (!guide) return;
+    document.getElementById('tooltip-title').textContent = 'How to measure — ' + guide.title;
+    document.getElementById('tooltip-body').innerHTML = guide.desc;
+    document.getElementById('tooltip-panel').classList.add('visible');
+    document.getElementById('tooltip-overlay').classList.add('visible');
+  });
+});
+
+function closeTooltip() {
+  document.getElementById('tooltip-panel').classList.remove('visible');
+  document.getElementById('tooltip-overlay').classList.remove('visible');
+}
+document.getElementById('tooltip-close').addEventListener('click', closeTooltip);
+document.getElementById('tooltip-overlay').addEventListener('click', closeTooltip);
+
+// ── ONBOARDING ────────────────────────────────────────────────────────────
+function startFromOnboarding(useDemo) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  if (useDemo) {
+    currentProfile = 'A';
+    document.querySelectorAll('.profile-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.profile === 'A');
+    });
+    fillForm(profiles.A);
+    Object.assign(profiles.custom, profiles.A);
+  }
+
+  const profileScreen = document.getElementById('screen-profile');
+  profileScreen.classList.add('active', 'fade-enter');
+  setTimeout(() => profileScreen.classList.remove('fade-enter'), 300);
+  document.querySelector('.nav-btn[data-screen="profile"]').classList.add('active');
+  currentScreen = 'profile';
+  renderRatioPanel(currentProfile);
+}
+
+document.getElementById('onboard-start').addEventListener('click', () => {
+  startFromOnboarding(false);
+  // Clear form so user enters their own measurements
+  ['f-waist','f-hip','f-highhip','f-thigh','f-inseam','f-outseam',
+   'f-frontrise','f-backrise','f-height','f-torso'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  profiles.custom = { label:'Your Measurements', waist:0, hip:0, highHip:0, thigh:0,
+    inseam:0, outseam:0, frontRise:0, backRise:0, height:0, torso:0 };
+  renderRatioPanel('custom');
+});
+
+document.getElementById('onboard-skip').addEventListener('click', () => {
+  startFromOnboarding(true);
+});
+
+// Also make nav work from onboarding state
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('screen-onboarding').classList.remove('active');
+  });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+fillForm(profiles.A);
+Object.assign(profiles.custom, profiles.A);
+// Don't render ratio panel yet — wait for onboarding
+// updateChipScores called after profile is set
 </script>
 </body>
 </html>
